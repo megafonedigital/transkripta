@@ -4,7 +4,6 @@ import { processVideoUrl, downloadFromUrl, getTunnelDownloadInfo, validateVideoU
 
 const Download = () => {
   const [url, setUrl] = useState('');
-  const [platform, setPlatform] = useState('youtube');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -66,29 +65,15 @@ const Download = () => {
   };
 
   const getQualityOptions = () => {
-    switch (platform) {
-      case 'youtube':
-        return [
-          { value: 'best', label: 'Melhor qualidade' },
-          { value: '1080p', label: '1080p' },
-          { value: '720p', label: '720p' },
-          { value: '480p', label: '480p' },
-          { value: '360p', label: '360p' }
-        ];
-      case 'instagram':
-        return [
-          { value: 'best', label: 'Melhor qualidade' },
-          { value: 'high', label: 'Alta qualidade' },
-          { value: 'medium', label: 'Qualidade média' }
-        ];
-      case 'tiktok':
-        return [
-          { value: 'best', label: 'Melhor qualidade' },
-          { value: 'high', label: 'Alta qualidade' }
-        ];
-      default:
-        return [{ value: 'best', label: 'Melhor qualidade' }];
-    }
+    return [
+      { value: 'best', label: 'Melhor qualidade' },
+      { value: '1080p', label: '1080p' },
+      { value: '720p', label: '720p' },
+      { value: '480p', label: '480p' },
+      { value: '360p', label: '360p' },
+      { value: 'high', label: 'Alta qualidade' },
+      { value: 'medium', label: 'Qualidade média' }
+    ];
   };
 
   const getFormatOptions = () => {
@@ -116,19 +101,7 @@ const Download = () => {
               required
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Plataforma</label>
-              <select
-                value={platform}
-                onChange={e => setPlatform(e.target.value)}
-                className="block w-full rounded-lg border-gray-300 dark:border-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-900 dark:text-white px-4 py-3"
-              >
-                <option value="youtube">YouTube</option>
-                <option value="instagram">Instagram</option>
-                <option value="tiktok">TikTok</option>
-              </select>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Qualidade</label>
               <select
