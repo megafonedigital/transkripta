@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { downloadVideo, transcribeAudio, validateVideoUrl, convertToAudio, handleApiError } from '../services/apiService';
+import { processVideoUrl, downloadFromUrl, transcribeAudio, validateVideoUrl, convertToAudio, handleApiError } from '../services/apiService';
 import { saveTranscription, updateMetrics, addLog } from '../services/storageService';
 import { 
   DocumentDuplicateIcon,
@@ -168,13 +168,18 @@ const NewTranscription = () => {
 
         updateProgressStatus(type, 'download');
         
-        // Download video
-        videoBlob = await downloadVideo(url, platform);
+        // Process video URL via webhook
+        const videoData = await processVideoUrl(url, { audioOnly: true });
         
         updateProgressStatus(type, 'convert');
         
-        // Convert to audio
-        audioFile = await convertToAudio(videoBlob);
+        // Download audio file from webhook response
+        if (videoData.audioUrl) {
+          const audioBlob = await downloadFromUrl(videoData.audioUrl);
+          audioFile = new File([audioBlob], `audio_${Date.now()}.mp3`, { type: 'audio/mpeg' });
+        } else {
+          throw new Error('URL de áudio não disponível');
+        }
         
       } else if (type === 'video') {
         updateProgressStatus(type, 'upload');

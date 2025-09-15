@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { processVideoUrl, downloadFromUrl, validateVideoUrl, handleApiError } from '../services/apiService';
 
 const Download = () => {
   const [url, setUrl] = useState('');
@@ -17,31 +18,46 @@ const Download = () => {
       setError('Por favor, insira a URL do vídeo');
       return;
     }
+    
+    // Validate URL
+    const detectedPlatform = validateVideoUrl(url);
+    if (!detectedPlatform) {
+      setError('URL inválida ou plataforma não suportada');
+      return;
+    }
+    
     setLoading(true);
     setError('');
     setSuccess('');
+    
     try {
-      const response = await fetch('http://localhost:3000/download', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ url, platform, quality, format, audioOnly })
+      // Process video URL via webhook
+      const videoData = await processVideoUrl(url, {
+        format: format,
+        quality: quality,
+        audioOnly: audioOnly
       });
-      if (!response.ok) throw new Error('Erro ao baixar o vídeo');
-      const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = `${platform}_${Date.now()}.${format}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(downloadUrl);
+      
+      // Determine download URL based on user preference
+      const downloadUrl = audioOnly ? videoData.audioUrl : videoData.videoUrl;
+      
+      if (!downloadUrl) {
+        throw new Error(`URL de ${audioOnly ? 'áudio' : 'vídeo'} não disponível`);
+      }
+      
+      // Generate filename
+      const extension = audioOnly ? 'mp3' : format;
+      const filename = videoData.title 
+        ? `${videoData.title.replace(/[^a-zA-Z0-9]/g, '_')}.${extension}`
+        : `${detectedPlatform}_${Date.now()}.${extension}`;
+      
+      // Download file
+      await downloadFromUrl(downloadUrl, filename);
+      
       setSuccess('Download concluído com sucesso!');
     } catch (error) {
-      setError(error.message);
+      console.error('Erro no download:', error);
+      setError(handleApiError(error));
     } finally {
       setLoading(false);
     }
@@ -169,4 +185,4 @@ const Download = () => {
   );
 };
 
-export default Download; 
+export default Download;

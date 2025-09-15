@@ -18,10 +18,11 @@ const config = {
     baseUrl: getEnvVar('REACT_APP_OPENAI_BASE_URL', 'https://api.openai.com/v1'),
   },
   
-  // RAPIDAPI removido conforme solicitado
-  
-  cobalt: {
-    apiUrl: getEnvVar('REACT_APP_COBALT_API_URL', 'https://api.cobalt.tools'),
+  // Webhook Configuration
+  webhook: {
+    url: getEnvVar('REACT_APP_WEBHOOK_URL'),
+    secret: getEnvVar('REACT_APP_WEBHOOK_SECRET'),
+    timeout: parseInt(getEnvVar('REACT_APP_WEBHOOK_TIMEOUT', '60000')), // ms
   },
   
   // Configurações da Aplicação
@@ -81,7 +82,8 @@ const config = {
 const validateConfig = () => {
   const requiredKeys = [
     'openai.apiKey',
-    // 'rapidapi.key', // Removido
+    'webhook.url',
+    'webhook.secret',
   ];
   
   const missing = [];
@@ -119,7 +121,7 @@ if (config.app.debug && config.logs.enableConsole) {
     ...config,
     // Ocultar chaves sensíveis nos logs
     openai: { ...config.openai, apiKey: config.openai.apiKey ? '***' : undefined },
-    // rapidapi: { ...config.rapidapi, key: config.rapidapi.key ? '***' : undefined }, // Removido
+    webhook: { ...config.webhook, secret: config.webhook.secret ? '***' : undefined },
     auth: { ...config.auth, jwtSecret: '***' },
   });
 }

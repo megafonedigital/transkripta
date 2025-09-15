@@ -4,8 +4,9 @@ import config from '../config/env';
 // Configurações das APIs
 const OPENAI_API_KEY = config.openai.apiKey;
 const OPENAI_API_URL = config.openai.baseUrl;
-// RAPIDAPI removido conforme solicitado
-const COBALT_API_URL = config.cobalt.apiUrl;
+const WEBHOOK_URL = config.webhook.url;
+const WEBHOOK_SECRET = config.webhook.secret;
+const WEBHOOK_TIMEOUT = config.webhook.timeout;
 const API_TIMEOUT = config.api.timeout;
 
 // Create axios instances
@@ -18,43 +19,59 @@ const openaiApi = axios.create({
   }
 });
 
-// RapidAPI removido - usando apenas Cobalt API
-
-const cobaltApi = axios.create({
-  baseURL: COBALT_API_URL,
-  timeout: API_TIMEOUT,
+// Webhook API instance
+const webhookApi = axios.create({
+  timeout: WEBHOOK_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    'X-Webhook-Secret': WEBHOOK_SECRET
   }
 });
 
-// Video Download Functions
-export const downloadVideo = async (url, platform) => {
+// Video Processing Functions via Webhook
+export const processVideoUrl = async (url, options = {}) => {
   try {
-    let downloadUrl;
+    console.log('Enviando URL para webhook:', url);
     
-    // Priorizar Cobalt como serviço principal
-    try {
-      console.log('Tentando download via Cobalt...');
-      downloadUrl = await downloadFromCobalt(url);
-    } catch (cobaltError) {
-      console.warn('Falha no Cobalt, tentando alternativas:', cobaltError.message);
-      
-      // RapidAPI removido - sem fallback adicional
-      throw cobaltError;
+    const requestData = {
+      url: url,
+      format: options.format || 'mp4',
+      quality: options.quality || '720p',
+      audioOnly: options.audioOnly || false,
+      timestamp: Date.now()
+    };
+    
+    console.log('Dados da requisição webhook:', requestData);
+    
+    const response = await webhookApi.post(WEBHOOK_URL, requestData);
+    
+    console.log('Resposta do webhook:', response.data);
+    
+    if (response.data && response.data.success) {
+      return {
+        videoUrl: response.data.videoUrl,
+        audioUrl: response.data.audioUrl,
+        title: response.data.title,
+        duration: response.data.duration,
+        thumbnail: response.data.thumbnail
+      };
     }
     
-    if (!downloadUrl) {
-      throw new Error('Não foi possível obter URL de download');
-    }
+    throw new Error('Webhook não retornou URLs válidas');
+  } catch (error) {
+    console.error('Erro no processamento via webhook:', error);
+    throw handleApiError(error);
+  }
+};
+
+// Download file from URL
+export const downloadFromUrl = async (url, filename) => {
+  try {
+    console.log('Fazendo download do arquivo:', url);
     
-    console.log('URL de download obtida:', downloadUrl);
-    
-    // Download the actual file
-    const response = await axios.get(downloadUrl, {
+    const response = await axios.get(url, {
       responseType: 'blob',
-      timeout: API_TIMEOUT * 2, // Mais tempo para download de arquivos grandes
+      timeout: API_TIMEOUT * 3, // Mais tempo para download de arquivos grandes
       onDownloadProgress: (progressEvent) => {
         if (progressEvent.total) {
           const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -63,64 +80,25 @@ export const downloadVideo = async (url, platform) => {
       }
     });
     
+    // Create download link
+    const blob = new Blob([response.data]);
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = filename || 'download';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+    
     return response.data;
   } catch (error) {
-    console.error('Erro no download do vídeo:', error);
+    console.error('Erro no download do arquivo:', error);
     throw handleApiError(error);
   }
 };
 
-// Função downloadFromYoutube removida - RAPIDAPI não será mais usado
-
-const downloadFromCobalt = async (url) => {
-  try {
-    console.log('Iniciando download via Cobalt para URL:', url);
-    
-    const requestData = {
-      url: url,
-      vCodec: 'h264',
-      vQuality: '720',
-      aFormat: 'mp3',
-      isAudioOnly: false,
-      isAudioMuted: false,
-      dubLang: false,
-      filenamePattern: 'classic'
-    };
-    
-    console.log('Dados da requisição Cobalt:', requestData);
-    
-    const response = await cobaltApi.post('/api/json', requestData);
-    
-    console.log('Resposta do Cobalt:', response.data);
-    
-    if (response.data) {
-      // Cobalt pode retornar diferentes formatos de resposta
-      if (response.data.url) {
-        return response.data.url;
-      } else if (response.data.picker && response.data.picker.length > 0) {
-        // Se houver múltiplas opções, pegar a primeira
-        return response.data.picker[0].url;
-      } else if (response.data.audio) {
-        // Se for apenas áudio
-        return response.data.audio;
-      }
-    }
-    
-    throw new Error('URL de download não encontrada na resposta do Cobalt');
-  } catch (error) {
-    console.error('Erro detalhado no Cobalt:', error.response?.data || error.message);
-    
-    if (error.response?.status === 400) {
-      throw new Error('URL inválida ou não suportada pelo Cobalt');
-    } else if (error.response?.status === 429) {
-      throw new Error('Limite de requisições excedido no Cobalt');
-    } else if (error.response?.status >= 500) {
-      throw new Error('Erro interno do servidor Cobalt');
-    }
-    
-    throw new Error(`Erro no download via Cobalt: ${error.message}`);
-   }
- };
+// Webhook processing functions replace previous download methods
 
 // Transcription Functions
 export const transcribeAudio = async (audioFile, options = {}) => {

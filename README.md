@@ -1,11 +1,11 @@
-# Transkipta - Frontend Only
+# Transkipta - Transcrição Simplificada
 
-Aplicação de transcrição de vídeos e áudios que funciona inteiramente no frontend, utilizando APIs externas para download e transcrição.
+Aplicação de transcrição de vídeos e áudios que utiliza webhook para processamento de URLs e OpenAI para transcrição.
 
 ## 🚀 Características
 
-- **Frontend-Only**: Não requer backend, funciona inteiramente no navegador
-- **Download de Vídeos**: Suporte para YouTube, Instagram, TikTok via APIs externas
+- **Processamento via Webhook**: URLs processadas através de webhook configurável
+- **Download Direto**: Suporte para YouTube, Instagram, TikTok via webhook
 - **Transcrição de Áudio**: Integração com OpenAI Whisper API
 - **Armazenamento Local**: Dados salvos no localStorage do navegador
 - **Autenticação Local**: Sistema de usuários baseado em localStorage
@@ -22,19 +22,46 @@ Aplicação de transcrição de vídeos e áudios que funciona inteiramente no f
 
 ## 📋 Pré-requisitos
 
-### APIs Externas Necessárias
+### APIs e Serviços Necessários
 
 1. **OpenAI API** - Para transcrição de áudio
    - Obtenha sua chave em: https://platform.openai.com/api-keys
 
-2. **Cobalt API** - Para download de vídeos
-- Usando: https://apiclip.megafone.digital
-   - Assine os serviços de download de vídeo
-
-3. **Cobalt API** - Alternativa para download
-   - Documentação: https://cobalt.tools/
+2. **Webhook de Processamento** - Para download de vídeos
+   - Configure seu próprio webhook que processa URLs de vídeo
+   - O webhook deve retornar URLs diretas para download de áudio/vídeo
+   - Formato de resposta esperado: `{ success: true, videoUrl: string, audioUrl: string, title?: string }`
 
 ## ⚙️ Configuração
+
+### Implementação do Webhook
+
+O webhook deve ser um endpoint HTTP que:
+
+1. **Recebe** uma requisição POST com:
+   ```json
+   {
+     "url": "https://youtube.com/watch?v=...",
+     "format": "mp4",
+     "quality": "720p",
+     "audioOnly": false,
+     "timestamp": 1234567890
+   }
+   ```
+
+2. **Retorna** uma resposta JSON:
+   ```json
+   {
+     "success": true,
+     "videoUrl": "https://direct-download-url.com/video.mp4",
+     "audioUrl": "https://direct-download-url.com/audio.mp3",
+     "title": "Título do Vídeo",
+     "duration": 180,
+     "thumbnail": "https://thumbnail-url.com/thumb.jpg"
+   }
+   ```
+
+3. **Autentica** usando o header `X-Webhook-Secret`
 
 ### Variáveis de Ambiente
 
@@ -43,8 +70,11 @@ Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 ```env
 # APIs Externas
 REACT_APP_OPENAI_API_KEY=sua_chave_openai
-# RAPIDAPI removido - usando apenas Cobalt API
-REACT_APP_COBALT_API_URL=https://api.cobalt.tools
+
+# Webhook Configuration
+REACT_APP_WEBHOOK_URL=https://seu-webhook.com/api/process
+REACT_APP_WEBHOOK_SECRET=sua_chave_secreta_webhook
+REACT_APP_WEBHOOK_TIMEOUT=60000
 
 # Configurações da Aplicação
 REACT_APP_APP_NAME=Transkipta
@@ -55,6 +85,14 @@ REACT_APP_SUPPORTED_FORMATS=mp4,mp3,wav,m4a,webm
 # Autenticação Local
 REACT_APP_JWT_SECRET=seu_jwt_secret_muito_seguro
 REACT_APP_SESSION_TIMEOUT=3600
+
+# Credenciais dos Usuários Padrão
+REACT_APP_ADMIN_USERNAME=admin
+REACT_APP_ADMIN_EMAIL=admin@transkipta.com
+REACT_APP_ADMIN_PASSWORD=sua_senha_admin
+REACT_APP_USER_USERNAME=user
+REACT_APP_USER_EMAIL=user@transkipta.com
+REACT_APP_USER_PASSWORD=sua_senha_user
 
 # Easypanel (Produção)
 REACT_APP_ENVIRONMENT=production
@@ -67,14 +105,21 @@ No Easypanel, configure as seguintes variáveis de ambiente:
 
 ```
 OPENAI_API_KEY=sua_chave_openai
-# RAPIDAPI removido - usando apenas Cobalt API
-COBALT_API_URL=https://api.cobalt.tools
+WEBHOOK_URL=https://seu-webhook.com/api/process
+WEBHOOK_SECRET=sua_chave_secreta_webhook
+WEBHOOK_TIMEOUT=60000
 APP_NAME=Transkipta
 APP_VERSION=2.0.0
 MAX_FILE_SIZE=100
 SUPPORTED_FORMATS=mp4,mp3,wav,m4a,webm
 JWT_SECRET=seu_jwt_secret_muito_seguro
 SESSION_TIMEOUT=3600
+ADMIN_USERNAME=admin
+ADMIN_EMAIL=admin@transkipta.com
+ADMIN_PASSWORD=sua_senha_admin
+USER_USERNAME=user
+USER_EMAIL=user@transkipta.com
+USER_PASSWORD=sua_senha_user
 ENVIRONMENT=production
 API_TIMEOUT=30000
 ```
@@ -108,7 +153,8 @@ docker build -t transkipta-frontend .
 # Execute o container
 docker run -p 80:80 \
   -e OPENAI_API_KEY=sua_chave \
-  # RAPIDAPI removido \
+  -e WEBHOOK_URL=https://seu-webhook.com/api/process \
+  -e WEBHOOK_SECRET=sua_chave_secreta \
   transkipta-frontend
 ```
 
@@ -151,9 +197,10 @@ docker run -p 80:80 \
 
 ## 🔧 Funcionalidades
 
-### Download de Vídeos
-- YouTube, Instagram, TikTok
-- Conversão automática para áudio
+### Processamento de Vídeos
+- YouTube, Instagram, TikTok via webhook
+- URLs processadas externamente
+- Download direto de áudio/vídeo
 - Suporte a múltiplos formatos
 
 ### Transcrição
@@ -194,9 +241,10 @@ docker run -p 80:80 \
    - Verifique se as chaves estão corretas
    - Confirme se as APIs estão ativas
 
-2. **Falha no Download**
+2. **Falha no Processamento**
    - Verifique a URL do vídeo
-   - Teste com diferentes APIs
+   - Confirme se o webhook está funcionando
+   - Teste a conectividade com o webhook
 
 3. **Erro de Transcrição**
    - Verifique o formato do áudio

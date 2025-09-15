@@ -30,16 +30,16 @@ const decodeToken = (token) => {
 const DEFAULT_USERS = [
   {
     id: 1,
-    username: 'admin',
-    email: 'admin@transkipta.com',
-    password: 'admin123', // In production, this would be hashed
+    username: process.env.REACT_APP_ADMIN_USERNAME || 'admin',
+    email: process.env.REACT_APP_ADMIN_EMAIL || 'admin@transkipta.com',
+    password: process.env.REACT_APP_ADMIN_PASSWORD || 'admin123', // In production, this would be hashed
     role: 'admin'
   },
   {
     id: 2,
-    username: 'user',
-    email: 'user@transkipta.com',
-    password: 'user123',
+    username: process.env.REACT_APP_USER_USERNAME || 'user',
+    email: process.env.REACT_APP_USER_EMAIL || 'user@transkipta.com',
+    password: process.env.REACT_APP_USER_PASSWORD || 'user123',
     role: 'user'
   }
 ];
