@@ -47,6 +47,23 @@ export const processVideoUrl = async (url, options = {}) => {
     
     console.log('Resposta do webhook:', response.data);
     
+    // Nova estrutura de resposta: array com objetos contendo status, url e filename
+    if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+      const videoData = response.data[0]; // Pega o primeiro item do array
+      
+      if (videoData.status === 'tunnel' && videoData.url && videoData.filename) {
+        return {
+          status: videoData.status,
+          videoUrl: videoData.url,
+          audioUrl: videoData.url, // Mesmo URL para áudio e vídeo no tunnel
+          title: videoData.filename.replace(/\.[^/.]+$/, ''), // Remove extensão do filename
+          filename: videoData.filename,
+          tunnelUrl: videoData.url
+        };
+      }
+    }
+    
+    // Fallback para estrutura antiga se necessário
     if (response.data && response.data.success) {
       return {
         videoUrl: response.data.videoUrl,
@@ -57,7 +74,7 @@ export const processVideoUrl = async (url, options = {}) => {
       };
     }
     
-    throw new Error('Webhook não retornou URLs válidas');
+    throw new Error('Webhook não retornou dados válidos');
   } catch (error) {
     console.error('Erro no processamento via webhook:', error);
     throw handleApiError(error);
@@ -96,6 +113,48 @@ export const downloadFromUrl = async (url, filename) => {
     console.error('Erro no download do arquivo:', error);
     throw handleApiError(error);
   }
+};
+
+// Process tunnel URL for transcription
+export const processTunnelUrl = async (tunnelUrl) => {
+  try {
+    console.log('Processando URL do tunnel para transcrição:', tunnelUrl);
+    
+    const response = await axios.get(tunnelUrl, {
+      responseType: 'blob',
+      timeout: API_TIMEOUT * 5, // Mais tempo para arquivos grandes
+      onDownloadProgress: (progressEvent) => {
+        if (progressEvent.total) {
+          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          console.log(`Download progress: ${progress}%`);
+        }
+      }
+    });
+    
+    // Return blob for transcription
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao processar URL do tunnel:', error);
+    throw handleApiError(error);
+  }
+};
+
+// Get direct download link for social download
+export const getTunnelDownloadInfo = (videoData) => {
+  if (videoData.status === 'tunnel' && videoData.tunnelUrl) {
+    return {
+      downloadUrl: videoData.tunnelUrl,
+      filename: videoData.filename,
+      title: videoData.title
+    };
+  }
+  
+  // Fallback para estrutura antiga
+  return {
+    downloadUrl: videoData.videoUrl || videoData.audioUrl,
+    filename: videoData.title ? `${videoData.title}.mp4` : 'download.mp4',
+    title: videoData.title
+  };
 };
 
 // Webhook processing functions replace previous download methods

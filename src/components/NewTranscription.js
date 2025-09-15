@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { processVideoUrl, downloadFromUrl, transcribeAudio, validateVideoUrl, convertToAudio, handleApiError } from '../services/apiService';
+import { processVideoUrl, downloadFromUrl, transcribeAudio, validateVideoUrl, convertToAudio, processTunnelUrl, handleApiError } from '../services/apiService';
 import { saveTranscription, updateMetrics, addLog } from '../services/storageService';
 import { 
   DocumentDuplicateIcon,
@@ -173,8 +173,13 @@ const NewTranscription = () => {
         
         updateProgressStatus(type, 'convert');
         
-        // Download audio file from webhook response
-        if (videoData.audioUrl) {
+        // Process tunnel URL or download audio file from webhook response
+        if (videoData.status === 'tunnel' && videoData.tunnelUrl) {
+          // Use tunnel URL directly for transcription
+          const audioBlob = await processTunnelUrl(videoData.tunnelUrl);
+          audioFile = new File([audioBlob], videoData.filename || `audio_${Date.now()}.mp3`, { type: 'audio/mpeg' });
+        } else if (videoData.audioUrl) {
+          // Fallback para estrutura antiga
           const audioBlob = await downloadFromUrl(videoData.audioUrl);
           audioFile = new File([audioBlob], `audio_${Date.now()}.mp3`, { type: 'audio/mpeg' });
         } else {

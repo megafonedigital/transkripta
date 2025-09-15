@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { processVideoUrl, downloadFromUrl, validateVideoUrl, handleApiError } from '../services/apiService';
+import { processVideoUrl, downloadFromUrl, getTunnelDownloadInfo, validateVideoUrl, handleApiError } from '../services/apiService';
 
 const Download = () => {
   const [url, setUrl] = useState('');
@@ -38,21 +38,23 @@ const Download = () => {
         audioOnly: audioOnly
       });
       
-      // Determine download URL based on user preference
-      const downloadUrl = audioOnly ? videoData.audioUrl : videoData.videoUrl;
+      // Get download info based on new tunnel structure
+      const downloadInfo = getTunnelDownloadInfo(videoData);
       
-      if (!downloadUrl) {
-        throw new Error(`URL de ${audioOnly ? 'áudio' : 'vídeo'} não disponível`);
+      if (!downloadInfo.downloadUrl) {
+        throw new Error(`URL de download não disponível`);
       }
       
-      // Generate filename
-      const extension = audioOnly ? 'mp3' : format;
-      const filename = videoData.title 
-        ? `${videoData.title.replace(/[^a-zA-Z0-9]/g, '_')}.${extension}`
-        : `${detectedPlatform}_${Date.now()}.${extension}`;
+      // Use filename from tunnel response or generate one
+      let filename = downloadInfo.filename;
+      if (audioOnly && !filename.toLowerCase().includes('.mp3')) {
+        // If requesting audio only, ensure proper extension
+        const baseName = filename.replace(/\.[^/.]+$/, '');
+        filename = `${baseName}.mp3`;
+      }
       
       // Download file
-      await downloadFromUrl(downloadUrl, filename);
+      await downloadFromUrl(downloadInfo.downloadUrl, filename);
       
       setSuccess('Download concluído com sucesso!');
     } catch (error) {
