@@ -5,8 +5,6 @@ import { processVideoUrl, downloadFromUrl, transcribeAudio, validateVideoUrl, co
 import { saveTranscription, updateMetrics, addLog } from '../services/storageService';
 import { 
   DocumentDuplicateIcon,
-  VideoCameraIcon,
-  MusicalNoteIcon,
   ArrowPathIcon,
   CheckCircleIcon,
   XCircleIcon
@@ -35,22 +33,13 @@ const sourceTypes = [
     borderColor: 'border-indigo-200 dark:border-indigo-800'
   },
   { 
-    id: 'video', 
-    name: 'Arquivo de Vídeo',
-    icon: <VideoCameraIcon className="w-8 h-8" />,
-    placeholder: 'Selecione um arquivo de vídeo',
-    color: 'text-blue-600 dark:text-blue-500',
-    bgColor: 'bg-blue-50 dark:bg-blue-900/20',
-    borderColor: 'border-blue-200 dark:border-blue-800'
-  },
-  { 
-    id: 'audio', 
-    name: 'Arquivo de Áudio',
-    icon: <MusicalNoteIcon className="w-8 h-8" />,
-    placeholder: 'Selecione um arquivo de áudio',
-    color: 'text-purple-600 dark:text-purple-500',
-    bgColor: 'bg-purple-50 dark:bg-purple-900/20',
-    borderColor: 'border-purple-200 dark:border-purple-800'
+    id: 'file', 
+    name: 'Arquivo',
+    icon: <DocumentDuplicateIcon className="w-8 h-8" />,
+    placeholder: 'Selecione um arquivo de vídeo ou áudio',
+    color: 'text-green-600 dark:text-green-500',
+    bgColor: 'bg-green-50 dark:bg-green-900/20',
+    borderColor: 'border-green-200 dark:border-green-800'
   }
 ];
 
@@ -154,16 +143,21 @@ const NewTranscription = () => {
           throw new Error('URL de áudio não disponível');
         }
         
-      } else if (type === 'video') {
+      } else if (type === 'file') {
         updateProgressStatus(type, 'upload');
         
-        // Convert video file to audio
-        updateProgressStatus(type, 'convert');
-        audioFile = await convertToAudio(file);
-        
-      } else if (type === 'audio') {
-        updateProgressStatus(type, 'upload');
-        audioFile = file;
+        // Check if file is video or audio and process accordingly
+        const fileType = file.type;
+        if (fileType.startsWith('video/')) {
+          // Convert video file to audio
+          updateProgressStatus(type, 'convert');
+          audioFile = await convertToAudio(file);
+        } else if (fileType.startsWith('audio/')) {
+          // Use audio file directly
+          audioFile = file;
+        } else {
+          throw new Error('Tipo de arquivo não suportado. Use apenas arquivos de vídeo ou áudio.');
+        }
       }
 
       // Step 2: Transcribe audio
@@ -362,13 +356,13 @@ const NewTranscription = () => {
               ) : (
                 <div>
                   <label htmlFor="file" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {type === 'video' ? 'Selecione um vídeo' : 'Selecione um áudio'}
+                    Selecione um arquivo de vídeo ou áudio
                   </label>
                   <input
                     type="file"
                     id="file"
                     onChange={handleFileChange}
-                    accept={type === 'video' ? 'video/*' : 'audio/*'}
+                    accept="video/*,audio/*"
                     className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
                       file:mr-4 file:py-3 file:px-4
                       file:rounded-lg file:border-0
