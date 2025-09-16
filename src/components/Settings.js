@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { getLogs, clearLogs } from '../services/storageService';
 
 const Settings = () => {
   // Removed API Key configuration - now handled via environment variables only
@@ -21,12 +21,31 @@ const Settings = () => {
     try {
       setLogsLoading(true);
       setError(null);
-      const params = { ...filters, limit: 100 };
-      const response = await axios.get('http://localhost:3000/logs', {
-        headers: { Authorization: `Bearer ${token}` },
-        params
-      });
-      setLogs(response.data);
+      
+      // Buscar logs do localStorage
+      const allLogs = getLogs();
+      
+      // Aplicar filtros
+      let filteredLogs = allLogs;
+      
+      if (filters.level) {
+        filteredLogs = filteredLogs.filter(log => log.level === filters.level);
+      }
+      
+      if (filters.startDate) {
+        const startDate = new Date(filters.startDate);
+        filteredLogs = filteredLogs.filter(log => new Date(log.timestamp) >= startDate);
+      }
+      
+      if (filters.endDate) {
+        const endDate = new Date(filters.endDate);
+        filteredLogs = filteredLogs.filter(log => new Date(log.timestamp) <= endDate);
+      }
+      
+      // Limitar a 100 logs mais recentes
+      filteredLogs = filteredLogs.slice(-100);
+      
+      setLogs(filteredLogs);
     } catch (err) {
       setError('Erro ao carregar logs');
     } finally {
@@ -45,10 +64,11 @@ const Settings = () => {
     if (!window.confirm('Tem certeza que deseja excluir os logs?')) return;
     try {
       setLoading(true);
-      await axios.delete('http://localhost:3000/logs', {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { startDate: filters.startDate, endDate: filters.endDate }
-      });
+      
+      // Limpar logs do localStorage
+      clearLogs();
+      
+      // Recarregar logs
       await fetchLogs();
     } catch (err) {
       setError('Erro ao excluir logs');

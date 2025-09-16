@@ -195,7 +195,7 @@ export const transcribeAudio = async (audioFile, options = {}) => {
 
 export const validateVideoUrl = (url) => {
   const patterns = {
-    youtube: /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)/,
+    youtube: /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)/,
     instagram: /(?:instagram\.com\/(?:p|reel|tv)\/)/,
     tiktok: /(?:tiktok\.com\/@[^\/]+\/video\/|vm\.tiktok\.com\/)/
   };

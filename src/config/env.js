@@ -49,7 +49,7 @@ const config = {
   
   // Configurações de API
   api: {
-    timeout: parseInt(getEnvVar('REACT_APP_API_TIMEOUT', '30000')), // ms
+    timeout: parseInt(getEnvVar('REACT_APP_API_TIMEOUT', '120000')), // ms
   },
   
   // Configurações de Cache
