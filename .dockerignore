@@ -5,7 +5,10 @@ yarn-debug.log*
 yarn-error.log*
 
 # Production build
+build/
 build
+dist/
+dist
 
 # Environment files
 .env.local
