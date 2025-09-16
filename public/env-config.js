@@ -14,12 +14,9 @@ window._env_ = {
   // Authentication
   REACT_APP_JWT_SECRET: 'your_jwt_secret_for_local_auth',
   REACT_APP_SESSION_TIMEOUT: '3600000',
-  // Default User Credentials
-  REACT_APP_ADMIN_USERNAME: 'admin',
-  REACT_APP_ADMIN_EMAIL: 'admin@transkipta.com',
-  REACT_APP_ADMIN_PASSWORD: 'admin123',
-  REACT_APP_USER_USERNAME: 'user',
-  REACT_APP_USER_EMAIL: 'user@transkipta.com',
-  REACT_APP_USER_PASSWORD: 'user123',
+  // Admin Credentials - CONFIGURE ESTAS VARIÁVEIS NO SEU AMBIENTE
+  REACT_APP_ADMIN_USERNAME: '',
+  REACT_APP_ADMIN_EMAIL: '',
+  REACT_APP_ADMIN_PASSWORD: '',
   REACT_APP_LOG_LEVEL: 'info'
 };

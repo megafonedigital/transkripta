@@ -25,22 +25,26 @@ const decodeToken = (token) => {
 };
 
 // Default users (in a real app, this would be handled by a proper auth service)
-const DEFAULT_USERS = [
-  {
-    id: 1,
-    username: process.env.REACT_APP_ADMIN_USERNAME || 'admin',
-    email: process.env.REACT_APP_ADMIN_EMAIL || 'admin@transkipta.com',
-    password: process.env.REACT_APP_ADMIN_PASSWORD || 'admin123', // In production, this would be hashed
-    role: 'admin'
-  },
-  {
-    id: 2,
-    username: process.env.REACT_APP_USER_USERNAME || 'user',
-    email: process.env.REACT_APP_USER_EMAIL || 'user@transkipta.com',
-    password: process.env.REACT_APP_USER_PASSWORD || 'user123',
-    role: 'user'
+const getDefaultUsers = () => {
+  // Verificar se as credenciais do administrador estão definidas nas variáveis de ambiente
+  const adminUsername = config.auth.adminUsername;
+  const adminEmail = config.auth.adminEmail;
+  const adminPassword = config.auth.adminPassword;
+  
+  if (!adminUsername || !adminEmail || !adminPassword) {
+    throw new Error('Credenciais de administrador não configuradas nas variáveis de ambiente. Configure as variáveis REACT_APP_ADMIN_USERNAME, REACT_APP_ADMIN_EMAIL e REACT_APP_ADMIN_PASSWORD no seu arquivo .env');
   }
-];
+  
+  return [
+    {
+      id: 1,
+      username: adminUsername,
+      email: adminEmail,
+      password: adminPassword, // In production, this would be hashed
+      role: 'admin'
+    }
+  ];
+};
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -53,7 +57,8 @@ const STORAGE_KEYS = {
 const initializeUsers = () => {
   const existingUsers = localStorage.getItem(STORAGE_KEYS.USERS);
   if (!existingUsers) {
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(DEFAULT_USERS));
+    const defaultUsers = getDefaultUsers();
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(defaultUsers));
   }
 };
 
@@ -65,7 +70,11 @@ export const login = async (username, password) => {
         initializeUsers();
         const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
         
-        const user = users.find(u => 
+        // Also check default users from environment variables
+        const defaultUsers = getDefaultUsers();
+        const allUsers = [...users, ...defaultUsers];
+        
+        const user = allUsers.find(u => 
           (u.username === username || u.email === username) && u.password === password
         );
         

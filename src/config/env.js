@@ -45,6 +45,9 @@ const config = {
   auth: {
     jwtSecret: getEnvVar('REACT_APP_JWT_SECRET', 'default-secret-key'),
     sessionTimeout: parseInt(getEnvVar('REACT_APP_SESSION_TIMEOUT', '3600')), // segundos
+    adminUsername: getEnvVar('REACT_APP_ADMIN_USERNAME'),
+    adminEmail: getEnvVar('REACT_APP_ADMIN_EMAIL'),
+    adminPassword: getEnvVar('REACT_APP_ADMIN_PASSWORD'),
   },
   
   // Configurações de API
@@ -86,6 +89,15 @@ const validateConfig = () => {
     'webhook.secret',
   ];
   
+  // Credenciais de administrador são obrigatórias apenas em produção
+  if (config.app.environment === 'production') {
+    requiredKeys.push(
+      'auth.adminUsername',
+      'auth.adminEmail',
+      'auth.adminPassword'
+    );
+  }
+  
   const missing = [];
   
   requiredKeys.forEach(key => {
@@ -122,7 +134,11 @@ if (config.app.debug && config.logs.enableConsole) {
     // Ocultar chaves sensíveis nos logs
     openai: { ...config.openai, apiKey: config.openai.apiKey ? '***' : undefined },
     webhook: { ...config.webhook, secret: config.webhook.secret ? '***' : undefined },
-    auth: { ...config.auth, jwtSecret: '***' },
+    auth: { 
+      ...config.auth, 
+      jwtSecret: '***',
+      adminPassword: config.auth.adminPassword ? '***' : undefined,
+    },
   });
 }
 
