@@ -199,6 +199,8 @@ export const updateMetrics = (metricData) => {
         metrics.daily[today].errors += 1;
         metrics.total.errors += 1;
         break;
+      default:
+        break;
     }
     
     metrics.lastUpdated = getCurrentTimestamp();

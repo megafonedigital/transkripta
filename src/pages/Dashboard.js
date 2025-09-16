@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Link, useNavigate } from 'react-router-dom';
-import { HomeIcon, DocumentTextIcon, ArrowLeftOnRectangleIcon, SunIcon, MoonIcon, ChartBarIcon, Cog6ToothIcon, ArrowDownTrayIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+import { useNavigate } from 'react-router-dom';
+import { HomeIcon, DocumentTextIcon, ArrowLeftOnRectangleIcon, SunIcon, MoonIcon, ChartBarIcon, Cog6ToothIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 import NewTranscription from '../components/NewTranscription';
 import History from '../components/History';
 import Metrics from '../components/Metrics';
@@ -122,4 +122,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
