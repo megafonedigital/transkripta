@@ -26,7 +26,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generate-config": "node scripts/generate-env-config.js",
+    "prebuild": "npm run generate-config"
   },
   "eslintConfig": {
     "extends": [

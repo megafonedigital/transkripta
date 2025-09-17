@@ -32,6 +32,9 @@ if (-not (Test-Path ".env")) {
     Write-Host "📝 Por favor, configure suas chaves de API no arquivo .env" -ForegroundColor Cyan
 }
 
+Write-Host "⚙️  Gerando arquivos de configuração..." -ForegroundColor Yellow
+node scripts/generate-env-config.js
+
 Write-Host "🏗️  Executando build..." -ForegroundColor Yellow
 npm run build
 
