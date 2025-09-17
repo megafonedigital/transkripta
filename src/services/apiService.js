@@ -81,10 +81,17 @@ export const processVideoUrl = async (url, options = {}) => {
   }
 };
 
-// Download file from URL
-export const downloadFromUrl = async (url, filename) => {
+// Download file from URL - Modified for direct redirect on tunnel URLs
+export const downloadFromUrl = async (url, filename, isDirect = false) => {
   try {
     console.log('Fazendo download do arquivo:', url);
+    
+    // If it's a direct tunnel URL, just redirect to it
+    if (isDirect) {
+      console.log('Redirecionando diretamente para:', url);
+      window.open(url, '_blank');
+      return;
+    }
     
     const response = await axios.get(url, {
       responseType: 'blob',

@@ -52,10 +52,13 @@ const Download = () => {
         filename = `${baseName}.mp3`;
       }
       
-      // Download file
-      await downloadFromUrl(downloadInfo.downloadUrl, filename);
+      // Check if it's a tunnel URL for direct redirect
+      const isTunnelUrl = videoData.status === 'tunnel';
       
-      setSuccess('Download concluído com sucesso!');
+      // Download file - use direct redirect for tunnel URLs
+      await downloadFromUrl(downloadInfo.downloadUrl, filename, isTunnelUrl);
+      
+      setSuccess(isTunnelUrl ? 'Download iniciado com sucesso!' : 'Download concluído com sucesso!');
     } catch (error) {
       console.error('Erro no download:', error);
       setError(handleApiError(error));
