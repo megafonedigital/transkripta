@@ -1,10 +1,23 @@
 window._env_ = {
-  REACT_APP_OPENAI_API_KEY: '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',
-  REACT_APP_OPENAI_API_URL: 'https://api.openai.com/v1',
-  // Webhook Configuration
+  // Replicate API Configuration
+  REPLICATE_API_TOKEN: 'r8_your-replicate-api-token-here',
+  REPLICATE_WEBHOOK_SECRET: 'whsec_your-webhook-signing-secret-here',
+  REPLICATE_WEBHOOK_URL: 'https://your-domain.com/api/webhooks/replicate',
+  
+  // Transcription Webhook Configuration
   REACT_APP_TRANSCRIPTION_WEBHOOK_URL: 'https://your-webhook-url.com/api/process',
-  REACT_APP_WEBHOOK_SECRET: 'your_webhook_secret_key',
-  REACT_APP_WEBHOOK_TIMEOUT: '60000',
+  REACT_APP_TRANSCRIPTION_WEBHOOK_SECRET: 'your-webhook-secret-key-here',
+  REACT_APP_TRANSCRIPTION_WEBHOOK_TIMEOUT: '60000',
+  
+  // Social Downloader webhook
+  REACT_APP_SOCIAL_WEBHOOK_URL: 'https://your-social-webhook.com/api/download',
+  REACT_APP_SOCIAL_WEBHOOK_SECRET: 'your_social_webhook_secret_key',
+  REACT_APP_SOCIAL_WEBHOOK_TIMEOUT: '60000',
+  
+  // Transcription Service Configuration
+  REACT_APP_TRANSCRIPTION_SERVICE: 'replicate',
+  REACT_APP_WHISPER_MODEL: 'openai/whisper-large-v3',
+  REACT_APP_MAX_AUDIO_DURATION: '7200',
   // Application Configuration
   REACT_APP_ENVIRONMENT: 'production',
   REACT_APP_DEBUG: 'false',
