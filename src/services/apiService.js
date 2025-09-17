@@ -104,52 +104,50 @@ export const downloadFromUrl = async (url, filename, isDirect = false) => {
           }
         }
         
-        // Try fetch first for better compatibility with Instagram URLs
-        try {
-          const response = await fetch(url, { mode: 'no-cors' });
-          if (response.type === 'opaque' || response.ok) {
-            // If fetch works, create download link
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = downloadFilename;
-            link.target = '_blank';
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            return;
+        // For Instagram URLs, use axios with blob to bypass CORS issues
+        console.log('Fazendo download via axios blob para Instagram...');
+        const response = await axios.get(url, {
+          responseType: 'blob',
+          timeout: API_TIMEOUT * 3,
+          headers: {
+            'Accept': '*/*',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
           }
-        } catch (fetchError) {
-          console.log('Fetch falhou, tentando link direto:', fetchError);
-        }
+        });
         
-        // Fallback: Try multiple download methods
-        // Method 1: Standard download link
+        // Create download link with blob
+        const blob = new Blob([response.data], { type: response.headers['content-type'] || 'video/mp4' });
+        const downloadUrl = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.href = url;
+        link.href = downloadUrl;
         link.download = downloadFilename;
-        link.target = '_blank';
         link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        window.URL.revokeObjectURL(downloadUrl);
         
-        // Method 2: Force download with iframe (for Instagram compatibility)
-        setTimeout(() => {
-          const iframe = document.createElement('iframe');
-          iframe.style.display = 'none';
-          iframe.src = url;
-          document.body.appendChild(iframe);
-          setTimeout(() => {
-            document.body.removeChild(iframe);
-          }, 2000);
-        }, 500);
-        
+        console.log('Download via blob concluído com sucesso!');
         return;
       } catch (directError) {
-        console.log('Download automático falhou, redirecionando:', directError);
-        window.open(url, '_blank');
-        return;
+        console.log('Download via blob falhou, tentando métodos alternativos:', directError);
+        
+        // Fallback: Try standard download link
+        try {
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename || 'download.mp4';
+          link.target = '_blank';
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          return;
+        } catch (linkError) {
+          console.log('Download via link falhou, redirecionando:', linkError);
+          window.open(url, '_blank');
+          return;
+        }
       }
     }
     
