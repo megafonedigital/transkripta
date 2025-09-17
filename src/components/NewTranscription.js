@@ -119,6 +119,8 @@ const NewTranscription = () => {
       const startTime = Date.now();
 
       // Step 1: Get audio file
+      let videoData = null;
+      
       if (type === 'social') {
         // Validate URL
         const platform = validateVideoUrl(url);
@@ -129,7 +131,7 @@ const NewTranscription = () => {
         updateProgressStatus(type, 'download');
         
         // Process video URL via webhook
-        const videoData = await processVideoUrl(url, { audioOnly: true });
+        videoData = await processVideoUrl(url, { audioOnly: true });
         
         updateProgressStatus(type, 'convert');
         
