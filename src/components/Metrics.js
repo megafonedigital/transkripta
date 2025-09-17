@@ -88,7 +88,7 @@ const Metrics = () => {
     const totalWords = transcriptions.reduce((sum, t) => sum + (t.wordCount || 0), 0);
     
     // Estimate costs (approximate values)
-    const costPerMinute = 0.006; // OpenAI Whisper pricing
+    const costPerMinute = 0.0023; // Replicate Whisper pricing
     const totalCostUsd = (totalDuration / 60) * costPerMinute;
     const totalCostBrl = totalCostUsd * 5.2; // Approximate USD to BRL
     

@@ -72,7 +72,7 @@ Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 REACT_APP_OPENAI_API_KEY=sua_chave_openai
 
 # Webhook Configuration
-REACT_APP_WEBHOOK_URL=https://seu-webhook.com/api/process
+REACT_APP_TRANSCRIPTION_WEBHOOK_URL=https://seu-webhook.com/api/process
 REACT_APP_WEBHOOK_SECRET=sua_chave_secreta_webhook
 REACT_APP_WEBHOOK_TIMEOUT=60000
 
@@ -153,7 +153,7 @@ docker build -t transkipta-frontend .
 # Execute o container
 docker run -p 80:80 \
   -e OPENAI_API_KEY=sua_chave \
-  -e WEBHOOK_URL=https://seu-webhook.com/api/process \
+  -e TRANSCRIPTION_WEBHOOK_URL=https://seu-webhook.com/api/process \
   -e WEBHOOK_SECRET=sua_chave_secreta \
   transkipta-frontend
 ```

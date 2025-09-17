@@ -2,29 +2,29 @@ import axios from 'axios';
 import config from '../config/env';
 
 // Configurações das APIs
-const OPENAI_API_KEY = config.openai.apiKey;
-const OPENAI_API_URL = config.openai.baseUrl;
-const WEBHOOK_URL = config.webhook.url;
-const WEBHOOK_SECRET = config.webhook.secret;
-const WEBHOOK_TIMEOUT = config.webhook.timeout;
+const TRANSCRIPTION_WEBHOOK_URL = config.transcriptionWebhook.url;
+const TRANSCRIPTION_WEBHOOK_SECRET = config.transcriptionWebhook.secret;
+const TRANSCRIPTION_WEBHOOK_TIMEOUT = config.transcriptionWebhook.timeout;
+const SOCIAL_WEBHOOK_URL = config.socialWebhook.url;
+const SOCIAL_WEBHOOK_SECRET = config.socialWebhook.secret;
+const SOCIAL_WEBHOOK_TIMEOUT = config.socialWebhook.timeout;
 const API_TIMEOUT = config.api.timeout;
 
-// Create axios instances
-const openaiApi = axios.create({
-  baseURL: OPENAI_API_URL,
-  timeout: API_TIMEOUT,
+// Transcription Webhook API instance
+const transcriptionWebhookApi = axios.create({
+  timeout: TRANSCRIPTION_WEBHOOK_TIMEOUT,
   headers: {
-    'Authorization': `Bearer ${OPENAI_API_KEY}`,
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'X-Webhook-Secret': TRANSCRIPTION_WEBHOOK_SECRET
   }
 });
 
-// Webhook API instance
-const webhookApi = axios.create({
-  timeout: WEBHOOK_TIMEOUT,
+// Social Downloader Webhook API instance
+const socialWebhookApi = axios.create({
+  timeout: SOCIAL_WEBHOOK_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
-    'X-Webhook-Secret': WEBHOOK_SECRET
+    'X-Webhook-Secret': SOCIAL_WEBHOOK_SECRET
   }
 });
 
@@ -43,7 +43,7 @@ export const processVideoUrl = async (url, options = {}) => {
     
     console.log('Dados da requisição webhook:', requestData);
     
-    const response = await webhookApi.post(WEBHOOK_URL, requestData);
+    const response = await socialWebhookApi.post(SOCIAL_WEBHOOK_URL, requestData);
     
     console.log('Resposta do webhook:', response.data);
     
@@ -167,36 +167,7 @@ export const getTunnelDownloadInfo = (videoData) => {
 // Webhook processing functions replace previous download methods
 
 // Transcription Functions
-export const transcribeAudio = async (audioFile, options = {}) => {
-  try {
-    const formData = new FormData();
-    formData.append('file', audioFile);
-    formData.append('model', options.model || 'whisper-1');
-    
-    if (options.language) {
-      formData.append('language', options.language);
-    }
-    
-    if (options.prompt) {
-      formData.append('prompt', options.prompt);
-    }
-    
-    const response = await openaiApi.post('/audio/transcriptions', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    
-    return {
-      text: response.data.text,
-      language: response.data.language || options.language,
-      duration: response.data.duration
-    };
-  } catch (error) {
-    console.error('Erro na transcrição:', error);
-    throw new Error(`Falha na transcrição: ${error.message}`);
-  }
-};
+// Função transcribeAudio removida - agora usando apenas Replicate Whisper
 
 // Utility Functions
 

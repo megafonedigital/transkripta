@@ -275,7 +275,7 @@ export const getSettings = () => {
       autoSave: true,
       notifications: true,
       apiKeys: {
-        openai: ''
+        // OpenAI removido - usando apenas Replicate
         // rapidapi removido conforme solicitado
       },
       transcriptionSettings: {

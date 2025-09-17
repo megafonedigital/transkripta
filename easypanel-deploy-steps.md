@@ -31,7 +31,7 @@ REACT_APP_OPENAI_API_KEY=your_credential_openai
 REACT_APP_OPENAI_API_URL=https://api.openai.com/v1
 
 # Webhook Configuration
-REACT_APP_WEBHOOK_URL=your_webhook_url_here
+REACT_APP_TRANSCRIPTION_WEBHOOK_URL=your_webhook_url_here
 REACT_APP_WEBHOOK_SECRET=your_webhook_secret_key
 REACT_APP_WEBHOOK_TIMEOUT=60000
 

@@ -2,7 +2,7 @@ window._env_ = {
   REACT_APP_OPENAI_API_KEY: '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',
   REACT_APP_OPENAI_API_URL: 'https://api.openai.com/v1',
   // Webhook Configuration
-  REACT_APP_WEBHOOK_URL: 'https://your-webhook-url.com/api/process',
+  REACT_APP_TRANSCRIPTION_WEBHOOK_URL: 'https://your-webhook-url.com/api/process',
   REACT_APP_WEBHOOK_SECRET: 'your_webhook_secret_key',
   REACT_APP_WEBHOOK_TIMEOUT: '60000',
   // Application Configuration

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { processVideoUrl, downloadFromUrl, transcribeAudio, validateVideoUrl, convertToAudio, processTunnelUrl, handleApiError } from '../services/apiService';
+import { processVideoUrl, downloadFromUrl, validateVideoUrl, convertToAudio, processTunnelUrl, handleApiError } from '../services/apiService';
+import replicateService from '../services/replicateService';
+import config from '../config/env';
 import { saveTranscription, updateMetrics, addLog } from '../services/storageService';
 import { 
   DocumentDuplicateIcon,
@@ -54,6 +56,7 @@ const NewTranscription = () => {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState('');
   const [outputFormat, setOutputFormat] = useState('plain');
+  const [transcriptionService, setTranscriptionService] = useState('replicate');
   const { token } = useAuth();
   const { isDarkMode } = useTheme();
 
@@ -163,13 +166,44 @@ const NewTranscription = () => {
       // Step 2: Transcribe audio
       updateProgressStatus(type, 'transcribe');
       
-      const transcriptionOptions = {
-        model: 'whisper-1',
+      // Use Replicate Whisper for all transcriptions
+      if (!replicateService.isConfigured()) {
+        throw new Error('Serviço Replicate não configurado. Verifique as variáveis de ambiente.');
+      }
+      
+      // Upload audio file to a temporary URL (you'll need to implement this)
+      // For now, we'll assume the audio is already accessible via URL
+      let audioUrl;
+      
+      if (type === 'social' && (videoData.status === 'tunnel' && videoData.tunnelUrl)) {
+        // Use tunnel URL directly
+        audioUrl = videoData.tunnelUrl;
+      } else if (type === 'social' && videoData.audioUrl) {
+        // Use webhook audio URL
+        audioUrl = videoData.audioUrl;
+      } else {
+        // For file uploads, we need to upload to a temporary service
+        // This is a placeholder - you'll need to implement file upload
+        throw new Error('Upload de arquivos locais para Replicate ainda não implementado. Use URLs de redes sociais.');
+      }
+      
+      const replicateOptions = {
         language: 'pt',
-        response_format: outputFormat === 'plain' ? 'text' : outputFormat
+        translate: false,
+        transcription: outputFormat === 'plain' ? 'plain text' : outputFormat
       };
-
-      const transcriptionResult = await transcribeAudio(audioFile, transcriptionOptions);
+      
+      // Create async transcription
+      const prediction = await replicateService.createTranscription(audioUrl, replicateOptions);
+      
+      // For async processing, we'll return a different result
+      const transcriptionResult = {
+        text: 'Transcrição iniciada com sucesso! O processamento está sendo feito de forma assíncrona.',
+        predictionId: prediction.id,
+        status: 'processing',
+        isAsync: true,
+        language: 'pt'
+      };
       
       // Step 3: Save transcription
       const duration = Math.round((Date.now() - startTime) / 1000);
@@ -184,8 +218,10 @@ const NewTranscription = () => {
         outputFormat: outputFormat,
         duration: duration,
         language: transcriptionResult.language || 'pt',
-        wordCount: transcriptionResult.text.split(' ').length,
-        status: 'completed'
+        wordCount: transcriptionResult.isAsync ? 0 : transcriptionResult.text.split(' ').length,
+        status: transcriptionResult.isAsync ? 'processing' : 'completed',
+        predictionId: transcriptionResult.predictionId || null,
+        service: 'replicate'
       };
 
       const savedTranscription = saveTranscription(transcriptionData);
@@ -277,7 +313,7 @@ const NewTranscription = () => {
             Transforme áudio em texto com facilidade. Suporte para vídeos do YouTube, Instagram, TikTok e arquivos locais.
           </p>
           <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Título e Formato de Saída lado a lado */}
+            {/* Título e Formato de Saída */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
               <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-xl">
                 <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -308,6 +344,7 @@ const NewTranscription = () => {
                   <option value="vtt">VTT (Web Video Text Tracks)</option>
                 </select>
               </div>
+
             </div>
             {/* Tipo de Conteúdo em linha */}
             <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-xl">

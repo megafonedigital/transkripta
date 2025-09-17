@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
-import { HomeIcon, DocumentTextIcon, ArrowLeftOnRectangleIcon, SunIcon, MoonIcon, ChartBarIcon, Cog6ToothIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, DocumentTextIcon, ArrowLeftOnRectangleIcon, SunIcon, MoonIcon, ChartBarIcon, Cog6ToothIcon, GlobeAltIcon, ClockIcon } from '@heroicons/react/24/outline';
 import NewTranscription from '../components/NewTranscription';
 import History from '../components/History';
 import Metrics from '../components/Metrics';
 import Settings from '../components/Settings';
 import Download from '../components/Download';
+import TranscriptionStatus from '../components/TranscriptionStatus';
 
 const Dashboard = () => {
   const { logout } = useAuth();
@@ -74,6 +75,17 @@ const Dashboard = () => {
               Histórico
             </button>
             <button
+              onClick={() => setActiveTab('status')}
+              className={`flex items-center px-4 py-3 text-sm font-medium rounded-md w-full transition-colors duration-200 ${
+                activeTab === 'status'
+                  ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              <ClockIcon className="mr-3 h-5 w-5" />
+              Status
+            </button>
+            <button
               onClick={() => setActiveTab('download')}
               className={`flex items-center px-4 py-3 text-sm font-medium rounded-md w-full transition-colors duration-200 ${
                 activeTab === 'download'
@@ -114,6 +126,7 @@ const Dashboard = () => {
           {activeTab === 'new' && <NewTranscription />}
           {activeTab === 'history' && <History />}
           {activeTab === 'metrics' && <Metrics />}
+          {activeTab === 'status' && <TranscriptionStatus />}
           {activeTab === 'settings' && <Settings />}
           {activeTab === 'download' && <Download />}
         </div>

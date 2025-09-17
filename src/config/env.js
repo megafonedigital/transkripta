@@ -12,17 +12,34 @@ const getEnvVar = (key, defaultValue = '') => {
 };
 
 const config = {
-  // APIs Externas
-  openai: {
-    apiKey: getEnvVar('REACT_APP_OPENAI_API_KEY'),
-    baseUrl: getEnvVar('REACT_APP_OPENAI_BASE_URL', 'https://api.openai.com/v1'),
+  // APIs Externas removidas - usando apenas Replicate
+  
+  // Transcription Webhook Configuration
+  transcriptionWebhook: {
+    url: getEnvVar('REACT_APP_TRANSCRIPTION_WEBHOOK_URL'),
+    secret: getEnvVar('REACT_APP_TRANSCRIPTION_WEBHOOK_SECRET'),
+    timeout: parseInt(getEnvVar('REACT_APP_TRANSCRIPTION_WEBHOOK_TIMEOUT', '60000')), // ms
   },
   
-  // Webhook Configuration
-  webhook: {
-    url: getEnvVar('REACT_APP_WEBHOOK_URL'),
-    secret: getEnvVar('REACT_APP_WEBHOOK_SECRET'),
-    timeout: parseInt(getEnvVar('REACT_APP_WEBHOOK_TIMEOUT', '60000')), // ms
+  // Social Downloader Webhook Configuration
+  socialWebhook: {
+    url: getEnvVar('REACT_APP_SOCIAL_WEBHOOK_URL'),
+    secret: getEnvVar('REACT_APP_SOCIAL_WEBHOOK_SECRET'),
+    timeout: parseInt(getEnvVar('REACT_APP_SOCIAL_WEBHOOK_TIMEOUT', '60000')), // ms
+  },
+  
+  // Replicate API Configuration
+  replicate: {
+    apiToken: getEnvVar('REPLICATE_API_TOKEN'),
+    webhookSecret: getEnvVar('REPLICATE_WEBHOOK_SECRET'),
+    webhookUrl: getEnvVar('REPLICATE_WEBHOOK_URL'),
+  },
+  
+  // Transcription Service Configuration
+  transcription: {
+    service: getEnvVar('REACT_APP_TRANSCRIPTION_SERVICE', 'replicate'),
+    whisperModel: getEnvVar('REACT_APP_WHISPER_MODEL', 'openai/whisper-large-v3'),
+    maxAudioDuration: parseInt(getEnvVar('REACT_APP_MAX_AUDIO_DURATION', '7200')), // segundos (2 horas)
   },
   
   // Configurações da Aplicação
@@ -84,9 +101,9 @@ const config = {
 // Validação de configurações obrigatórias
 const validateConfig = () => {
   const requiredKeys = [
-    'openai.apiKey',
-    'webhook.url',
-    'webhook.secret',
+    'replicate.apiToken',
+    'replicate.webhookSecret',
+    'replicate.webhookUrl'
   ];
   
   // Credenciais de administrador são obrigatórias apenas em produção
@@ -132,8 +149,12 @@ if (config.app.debug && config.logs.enableConsole) {
   console.log('Configurações carregadas:', {
     ...config,
     // Ocultar chaves sensíveis nos logs
-    openai: { ...config.openai, apiKey: config.openai.apiKey ? '***' : undefined },
     webhook: { ...config.webhook, secret: config.webhook.secret ? '***' : undefined },
+    replicate: { 
+      ...config.replicate, 
+      apiToken: config.replicate.apiToken ? '***' : undefined,
+      webhookSecret: config.replicate.webhookSecret ? '***' : undefined,
+    },
     auth: { 
       ...config.auth, 
       jwtSecret: '***',
