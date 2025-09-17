@@ -82,16 +82,43 @@ export const processVideoUrl = async (url, options = {}) => {
   }
 };
 
-// Download file from URL - Modified for direct redirect on tunnel URLs
+// Download file from URL - Modified for automatic download
 export const downloadFromUrl = async (url, filename, isDirect = false) => {
   try {
     console.log('Fazendo download do arquivo:', url);
     
-    // If it's a direct tunnel URL, just redirect to it
+    // For direct URLs, try to download automatically first
     if (isDirect) {
-      console.log('Redirecionando diretamente para:', url);
-      window.open(url, '_blank');
-      return;
+      console.log('Tentando download automático de URL direta:', url);
+      try {
+        // Improve filename with proper extension if missing
+        let downloadFilename = filename || 'download';
+        if (!downloadFilename.includes('.')) {
+          // Try to detect extension from URL
+          const urlPath = new URL(url).pathname;
+          const urlExtension = urlPath.split('.').pop();
+          if (urlExtension && urlExtension.length <= 4) {
+            downloadFilename += '.' + urlExtension;
+          } else {
+            downloadFilename += '.mp4'; // Default to mp4
+          }
+        }
+        
+        // Create a temporary link to trigger download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = downloadFilename;
+        link.target = '_blank';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+      } catch (directError) {
+        console.log('Download automático falhou, redirecionando:', directError);
+        window.open(url, '_blank');
+        return;
+      }
     }
     
     const response = await axios.get(url, {

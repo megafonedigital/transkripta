@@ -62,7 +62,7 @@ const Download = () => {
       if (isTunnelUrl) {
         setSuccess('Download iniciado com sucesso!');
       } else if (isDirectUrl) {
-        setSuccess('Redirecionando para download...');
+        setSuccess('Download automático iniciado!');
       } else {
         setSuccess('Download concluído com sucesso!');
       }
