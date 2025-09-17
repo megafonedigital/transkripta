@@ -54,11 +54,18 @@ const Download = () => {
       
       // Check if it's a tunnel URL for direct redirect
       const isTunnelUrl = videoData.status === 'tunnel';
+      const isDirectUrl = videoData.status === 'redirect';
       
       // Download file - use direct redirect for tunnel URLs
-      await downloadFromUrl(downloadInfo.downloadUrl, filename, isTunnelUrl);
+      await downloadFromUrl(downloadInfo.downloadUrl, filename, isTunnelUrl || isDirectUrl);
       
-      setSuccess(isTunnelUrl ? 'Download iniciado com sucesso!' : 'Download concluído com sucesso!');
+      if (isTunnelUrl) {
+        setSuccess('Download iniciado com sucesso!');
+      } else if (isDirectUrl) {
+        setSuccess('Redirecionando para download...');
+      } else {
+        setSuccess('Download concluído com sucesso!');
+      }
     } catch (error) {
       console.error('Erro no download:', error);
       setError(handleApiError(error));

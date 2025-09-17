@@ -51,14 +51,15 @@ export const processVideoUrl = async (url, options = {}) => {
     if (response.data && Array.isArray(response.data) && response.data.length > 0) {
       const videoData = response.data[0]; // Pega o primeiro item do array
       
-      if (videoData.status === 'tunnel' && videoData.url && videoData.filename) {
+      if ((videoData.status === 'tunnel' || videoData.status === 'redirect') && videoData.url && videoData.filename) {
         return {
           status: videoData.status,
           videoUrl: videoData.url,
-          audioUrl: videoData.url, // Mesmo URL para áudio e vídeo no tunnel
+          audioUrl: videoData.url, // Mesmo URL para áudio e vídeo
           title: videoData.filename.replace(/\.[^/.]+$/, ''), // Remove extensão do filename
           filename: videoData.filename,
-          tunnelUrl: videoData.url
+          tunnelUrl: videoData.url, // Mantém compatibilidade
+          directUrl: videoData.url
         };
       }
     }
@@ -148,9 +149,9 @@ export const processTunnelUrl = async (tunnelUrl) => {
 
 // Get direct download link for social download
 export const getTunnelDownloadInfo = (videoData) => {
-  if (videoData.status === 'tunnel' && videoData.tunnelUrl) {
-    return {
-      downloadUrl: videoData.tunnelUrl,
+  if ((videoData.status === 'tunnel' || videoData.status === 'redirect') && videoData.tunnelUrl) {
+        return {
+          downloadUrl: videoData.tunnelUrl,
       filename: videoData.filename,
       title: videoData.title
     };

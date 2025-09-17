@@ -136,7 +136,7 @@ const NewTranscription = () => {
         updateProgressStatus(type, 'convert');
         
         // Process tunnel URL or download audio file from webhook response
-        if (videoData.status === 'tunnel' && videoData.tunnelUrl) {
+        if ((videoData.status === 'tunnel' || videoData.status === 'redirect') && videoData.tunnelUrl) {
           // Use tunnel URL directly for transcription
           const audioBlob = await processTunnelUrl(videoData.tunnelUrl);
           audioFile = new File([audioBlob], videoData.filename || `audio_${Date.now()}.mp3`, { type: 'audio/mpeg' });
@@ -177,7 +177,7 @@ const NewTranscription = () => {
       // For now, we'll assume the audio is already accessible via URL
       let audioUrl;
       
-      if (type === 'social' && (videoData.status === 'tunnel' && videoData.tunnelUrl)) {
+      if (type === 'social' && ((videoData.status === 'tunnel' || videoData.status === 'redirect') && videoData.tunnelUrl)) {
         // Use tunnel URL directly
         audioUrl = videoData.tunnelUrl;
       } else if (type === 'social' && videoData.audioUrl) {
