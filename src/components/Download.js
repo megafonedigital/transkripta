@@ -86,14 +86,7 @@ const Download = () => {
     ];
   };
 
-  const getFormatOptions = () => {
-    if (audioOnly) return [{ value: 'mp3', label: 'MP3' }];
-    return [
-      { value: 'mp4', label: 'MP4' },
-      { value: 'webm', label: 'WebM' },
-      { value: 'mkv', label: 'MKV' }
-    ];
-  };
+  // Removed format options - using default MP4 for video and MP3 for audio
 
   return (
     <div className="p-8">
@@ -111,7 +104,7 @@ const Download = () => {
               required
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Qualidade</label>
               <select
@@ -124,32 +117,22 @@ const Download = () => {
                 ))}
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Formato</label>
-              <select
-                value={format}
-                onChange={e => setFormat(e.target.value)}
-                className="block w-full rounded-lg border-gray-300 dark:border-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-900 dark:text-white px-4 py-3"
-              >
-                {getFormatOptions().map(option => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </select>
+            <div className="flex items-center space-x-2">
+              <input
+                id="audioOnly"
+                type="checkbox"
+                checked={audioOnly}
+                onChange={e => {
+                  setAudioOnly(e.target.checked);
+                  if (e.target.checked) setFormat('mp3');
+                  else setFormat('mp4');
+                }}
+                className="h-5 w-5 text-indigo-600 border-gray-300 rounded dark:bg-gray-900 dark:border-gray-700 focus:ring-indigo-500"
+              />
+              <label htmlFor="audioOnly" className="text-sm text-gray-700 dark:text-gray-300">Apenas áudio (MP3)</label>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <input
-              id="audioOnly"
-              type="checkbox"
-              checked={audioOnly}
-              onChange={e => {
-                setAudioOnly(e.target.checked);
-                if (e.target.checked) setFormat('mp3');
-              }}
-              className="h-5 w-5 text-indigo-600 border-gray-300 rounded dark:bg-gray-900 dark:border-gray-700 focus:ring-indigo-500"
-            />
-            <label htmlFor="audioOnly" className="text-sm text-gray-700 dark:text-gray-300">Apenas áudio</label>
-          </div>
+
           {error && <div className="rounded bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-200 px-4 py-2 text-sm">{error}</div>}
           {success && <div className="rounded bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-200 px-4 py-2 text-sm">{success}</div>}
           <button
