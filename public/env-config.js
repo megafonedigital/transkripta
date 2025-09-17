@@ -1,8 +1,8 @@
 window._env_ = {
   // Replicate API Configuration
-  REPLICATE_API_TOKEN: 'r8_your-replicate-api-token-here',
-  REPLICATE_WEBHOOK_SECRET: 'whsec_your-webhook-signing-secret-here',
-  REPLICATE_WEBHOOK_URL: 'https://your-domain.com/api/webhooks/replicate',
+  REPLICATE_API_TOKEN: 'r8_temp_token_for_development',
+  REPLICATE_WEBHOOK_SECRET: 'whsec_temp_secret_for_development',
+  REPLICATE_WEBHOOK_URL: 'https://transkripta.megafone.digital/api/webhooks/replicate',
   
   // Transcription Webhook Configuration
   REACT_APP_TRANSCRIPTION_WEBHOOK_URL: 'https://your-webhook-url.com/api/process',
