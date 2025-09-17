@@ -19,7 +19,7 @@ window._env_ = {
   REACT_APP_WHISPER_MODEL: 'openai/whisper-large-v3',
   REACT_APP_MAX_AUDIO_DURATION: '7200',
   // Application Configuration
-  REACT_APP_ENVIRONMENT: 'production',
+  REACT_APP_ENVIRONMENT: 'development',
   REACT_APP_DEBUG: 'false',
   REACT_APP_API_TIMEOUT: '30000',
   REACT_APP_MAX_FILE_SIZE: '100000000',
