@@ -104,7 +104,27 @@ export const downloadFromUrl = async (url, filename, isDirect = false) => {
           }
         }
         
-        // Create a temporary link to trigger download
+        // Try fetch first for better compatibility with Instagram URLs
+        try {
+          const response = await fetch(url, { mode: 'no-cors' });
+          if (response.type === 'opaque' || response.ok) {
+            // If fetch works, create download link
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = downloadFilename;
+            link.target = '_blank';
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            return;
+          }
+        } catch (fetchError) {
+          console.log('Fetch falhou, tentando link direto:', fetchError);
+        }
+        
+        // Fallback: Try multiple download methods
+        // Method 1: Standard download link
         const link = document.createElement('a');
         link.href = url;
         link.download = downloadFilename;
@@ -113,6 +133,18 @@ export const downloadFromUrl = async (url, filename, isDirect = false) => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        
+        // Method 2: Force download with iframe (for Instagram compatibility)
+        setTimeout(() => {
+          const iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.src = url;
+          document.body.appendChild(iframe);
+          setTimeout(() => {
+            document.body.removeChild(iframe);
+          }, 2000);
+        }, 500);
+        
         return;
       } catch (directError) {
         console.log('Download automático falhou, redirecionando:', directError);
