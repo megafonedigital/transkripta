@@ -30,9 +30,9 @@ const config = {
   
   // Replicate API Configuration
   replicate: {
-    apiToken: getEnvVar('REPLICATE_API_TOKEN'),
-    webhookSecret: getEnvVar('REPLICATE_WEBHOOK_SECRET'),
-    webhookUrl: getEnvVar('REPLICATE_WEBHOOK_URL'),
+    apiToken: getEnvVar('REACT_APP_REPLICATE_API_TOKEN'),
+    webhookSecret: getEnvVar('REACT_APP_REPLICATE_WEBHOOK_SECRET'),
+    webhookUrl: getEnvVar('REACT_APP_REPLICATE_WEBHOOK_URL'),
   },
   
   // Transcription Service Configuration
@@ -140,9 +140,7 @@ const validateConfig = () => {
 };
 
 // Validar configurações na inicialização
-if (config.app.environment === 'production') {
-  validateConfig();
-}
+validateConfig();
 
 // Log de configurações em desenvolvimento
 if (config.app.debug && config.logs.enableConsole) {

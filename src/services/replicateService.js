@@ -249,6 +249,19 @@ class ReplicateService {
   }
 
   /**
+   * Obtém todas as predições do localStorage
+   * @returns {Object} - Objeto com todas as predições
+   */
+  getPredictions() {
+    try {
+      return this.getAllPredictions();
+    } catch (error) {
+      console.warn('Erro ao obter predições:', error);
+      return {};
+    }
+  }
+
+  /**
    * Obtém predições ativas (em processamento)
    * @returns {Array} - Lista de predições ativas
    */
