@@ -1,0 +1,369 @@
+[
+  {
+    "time": "2025-10-08T14:51:48.978Z",
+    "level": "info",
+    "message": "Login realizado",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T14:52:09.340Z",
+    "level": "info",
+    "message": "Login realizado",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T14:55:14.651Z",
+    "level": "info",
+    "message": "Login realizado",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T14:59:40.111Z",
+    "level": "info",
+    "message": "Login realizado",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T15:00:29.120Z",
+    "level": "info",
+    "message": "Login realizado",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T15:04:00.878Z",
+    "level": "info",
+    "message": "Login realizado",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T15:04:25.108Z",
+    "level": "info",
+    "message": "Login realizado",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T15:07:12.231Z",
+    "level": "error",
+    "message": "Login inválido",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T15:07:22.128Z",
+    "level": "info",
+    "message": "Login realizado",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T15:08:41.820Z",
+    "level": "info",
+    "message": "Login realizado",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T15:09:31.591Z",
+    "level": "info",
+    "message": "Login realizado",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T15:10:17.559Z",
+    "level": "info",
+    "message": "Login realizado",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T15:12:07.193Z",
+    "level": "info",
+    "message": "Login realizado",
+    "meta": {
+      "username": "admin"
+    }
+  },
+  {
+    "time": "2025-10-08T15:38:49.862Z",
+    "level": "info",
+    "message": "Webhook de transcrição recebido",
+    "meta": {
+      "id": "4hyx2xsnr1rg80cskg38w0bwn4",
+      "status": "processing"
+    }
+  },
+  {
+    "time": "2025-10-08T16:35:24.702Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "bd64f414-dfcf-4d52-8446-d71fdd73069f",
+      "url": "https://www.instagram.com/reel/DOngazvjJ9D/",
+      "sourceType": "Instagram"
+    }
+  },
+  {
+    "time": "2025-10-08T16:35:49.192Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "7e82dcb6-5d8c-4648-9af7-5912d82d567c",
+      "url": "https://www.instagram.com/reel/DOngazvjJ9D/",
+      "sourceType": "Instagram"
+    }
+  },
+  {
+    "time": "2025-10-08T16:35:55.999Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "03rryb6rr9rgc0csrjptzw2mn0",
+      "url": "https://www.instagram.com/reel/DOngazvjJ9D/",
+      "sourceType": "Instagram"
+    }
+  },
+  {
+    "time": "2025-10-08T16:39:12.015Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "e874df90-eff4-41e0-bcfd-8e04fc4dbd57",
+      "url": "https://www.instagram.com/reel/DOngazvjJ9D/",
+      "sourceType": "Instagram"
+    }
+  },
+  {
+    "time": "2025-10-08T16:39:36.261Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "wt0nw19st1rg80csrjrvfz74p0",
+      "url": "https://www.instagram.com/reel/DOngazvjJ9D/",
+      "sourceType": "Instagram"
+    }
+  },
+  {
+    "time": "2025-10-08T16:42:31.468Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "fmfqkbwtcnrge0csrjsrt4z17w",
+      "url": "https://www.instagram.com/reel/DOngazvjJ9D/",
+      "sourceType": "Instagram"
+    }
+  },
+  {
+    "time": "2025-10-08T16:47:11.516Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "cktpzbhc35rg80csrjw9y8v2k0",
+      "url": "https://www.instagram.com/reel/DOngazvjJ9D/",
+      "sourceType": "Instagram"
+    }
+  },
+  {
+    "time": "2025-10-08T16:52:54.476Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "b72v0jv7t9rge0csrjyr8qt570",
+      "url": "https://www.instagram.com/reel/DOngazvjJ9D/",
+      "sourceType": "Instagram"
+    }
+  },
+  {
+    "time": "2025-10-08T16:52:55.615Z",
+    "level": "info",
+    "message": "Webhook de transcrição recebido",
+    "meta": {
+      "status": "completed"
+    }
+  },
+  {
+    "time": "2025-10-08T17:00:30.393Z",
+    "level": "info",
+    "message": "Webhook de transcrição recebido",
+    "meta": {
+      "id": "b72v0jv7t9rge0csrjyr8qt570",
+      "status": "succeeded"
+    }
+  },
+  {
+    "time": "2025-10-08T17:31:28.594Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "c3f290db-d86f-4ad1-9b24-a61c653be3f5",
+      "url": "https://www.instagram.com/reel/DOngazvjJ9D/",
+      "sourceType": "Instagram"
+    }
+  },
+  {
+    "time": "2025-10-08T17:32:10.484Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "1sw06316p9rge0csrkgrnwjbsw",
+      "url": "https://www.instagram.com/reel/DOngazvjJ9D/",
+      "sourceType": "Instagram"
+    }
+  },
+  {
+    "time": "2025-10-08T17:32:11.297Z",
+    "level": "info",
+    "message": "Webhook de transcrição recebido",
+    "meta": {
+      "id": "1sw06316p9rge0csrkgrnwjbsw",
+      "status": "succeeded"
+    }
+  },
+  {
+    "time": "2025-10-08T17:36:33.519Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "8gyvf0casxrg80csrkjaaejdh0",
+      "url": "https://www.instagram.com/reel/DPhVjDzANl7/",
+      "sourceType": "Instagram"
+    }
+  },
+  {
+    "time": "2025-10-08T17:36:34.629Z",
+    "level": "info",
+    "message": "Webhook de transcrição recebido",
+    "meta": {
+      "id": "8gyvf0casxrg80csrkjaaejdh0",
+      "status": "succeeded"
+    }
+  },
+  {
+    "time": "2025-10-08T18:58:20.809Z",
+    "level": "info",
+    "message": "Transcription deleted",
+    "meta": {
+      "id": "cktpzbhc35rg80csrjw9y8v2k0",
+      "title": "ttt",
+      "status": "processing"
+    }
+  },
+  {
+    "time": "2025-10-08T18:58:23.214Z",
+    "level": "info",
+    "message": "Transcription deleted",
+    "meta": {
+      "id": "wt0nw19st1rg80csrjrvfz74p0",
+      "title": "t",
+      "status": "processing"
+    }
+  },
+  {
+    "time": "2025-10-08T18:58:24.615Z",
+    "level": "info",
+    "message": "Transcription deleted",
+    "meta": {
+      "id": "fmfqkbwtcnrge0csrjsrt4z17w",
+      "title": "g",
+      "status": "processing"
+    }
+  },
+  {
+    "time": "2025-10-08T18:58:26.496Z",
+    "level": "info",
+    "message": "Transcription deleted",
+    "meta": {
+      "id": "e874df90-eff4-41e0-bcfd-8e04fc4dbd57",
+      "title": "t",
+      "status": "processing"
+    }
+  },
+  {
+    "time": "2025-10-08T18:58:27.733Z",
+    "level": "info",
+    "message": "Transcription deleted",
+    "meta": {
+      "id": "7e82dcb6-5d8c-4648-9af7-5912d82d567c",
+      "title": "test2",
+      "status": "processing"
+    }
+  },
+  {
+    "time": "2025-10-08T18:58:28.857Z",
+    "level": "info",
+    "message": "Transcription deleted",
+    "meta": {
+      "id": "03rryb6rr9rgc0csrjptzw2mn0",
+      "title": "test2",
+      "status": "processing"
+    }
+  },
+  {
+    "time": "2025-10-08T18:58:30.340Z",
+    "level": "info",
+    "message": "Transcription deleted",
+    "meta": {
+      "id": "bd64f414-dfcf-4d52-8446-d71fdd73069f",
+      "title": "Teste",
+      "status": "processing"
+    }
+  },
+  {
+    "time": "2025-10-08T18:58:34.605Z",
+    "level": "info",
+    "message": "Transcription deleted",
+    "meta": {
+      "id": "c3f290db-d86f-4ad1-9b24-a61c653be3f5",
+      "title": "FFF",
+      "status": "processing"
+    }
+  },
+  {
+    "time": "2025-10-08T19:08:39.698Z",
+    "level": "info",
+    "message": "Transcription deleted",
+    "meta": {
+      "id": "b72v0jv7t9rge0csrjyr8qt570",
+      "title": "aaaaa",
+      "status": "completed"
+    }
+  },
+  {
+    "time": "2025-10-09T15:06:42.391Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "ex6s00mf7srge0css61adgt4gw",
+      "url": "https://www.instagram.com/reel/DOngazvjJ9D/",
+      "sourceType": "Instagram"
+    }
+  },
+  {
+    "time": "2025-10-09T15:06:43.534Z",
+    "level": "info",
+    "message": "Webhook de transcrição recebido",
+    "meta": {
+      "id": "ex6s00mf7srge0css61adgt4gw",
+      "status": "succeeded"
+    }
+  }
+]

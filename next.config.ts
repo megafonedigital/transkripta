@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  eslint: { ignoreDuringBuilds: false },
+  typescript: { ignoreBuildErrors: false },
+  async redirects() {
+    return [
+      { source: '/', destination: '/login', permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;
