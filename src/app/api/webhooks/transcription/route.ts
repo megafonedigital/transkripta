@@ -29,10 +29,11 @@ export async function POST(req: Request) {
   const items = await readTranscriptions();
   const idx = id ? items.findIndex((i) => i.id === id) : -1;
   if (idx >= 0) {
+    // Regra simples: se veio error no body, força status como erro
+    const hasError = !!errorMessage || statusRaw === "failed" || statusRaw === "error";
     const mappedStatus: TranscriptionItem["status"] =
+      hasError ? "error" :
       statusRaw === "succeeded" ? "completed" :
-      statusRaw === "failed" ? "error" :
-      statusRaw === "error" ? "error" :
       statusRaw === "processing" ? "processing" : "processing";
     items[idx].status = mappedStatus;
     items[idx].audioUrl = audioNormalized || items[idx].audioUrl;
