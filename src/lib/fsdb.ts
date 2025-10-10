@@ -34,6 +34,8 @@ export type TranscriptionItem = {
   sourceUrl: string;
   sourceFiles?: string[]; // opcional: nomes de arquivos enviados
   audioUrl?: string;
+  // mensagem de erro opcional quando o processamento falhar
+  errorMessage?: string;
   status: "processing" | "completed" | "error";
   transcription?: string | null;
   createdAt: string;

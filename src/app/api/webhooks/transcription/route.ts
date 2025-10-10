@@ -8,8 +8,9 @@ export async function POST(req: Request) {
 
   const id = obj.id as string | undefined;
   const output = obj.output as Record<string, unknown> | undefined;
-  const statusRaw = (obj.status as string | undefined) ?? "completed";
+  const statusRaw = (obj.status as string | undefined) ?? "processing";
   const input = obj.input as Record<string, unknown> | undefined;
+  const errorMessage = typeof obj.error === "string" ? obj.error : undefined;
 
   // Normaliza possíveis crases/espacos em URLs vindas de integrações
   const audioInput = input?.audio as string | undefined;
@@ -28,14 +29,21 @@ export async function POST(req: Request) {
   const items = await readTranscriptions();
   const idx = id ? items.findIndex((i) => i.id === id) : -1;
   if (idx >= 0) {
-    const mappedStatus: TranscriptionItem["status"] = statusRaw === "succeeded" ? "completed" : (statusRaw as TranscriptionItem["status"]);
+    const mappedStatus: TranscriptionItem["status"] =
+      statusRaw === "succeeded" ? "completed" :
+      statusRaw === "failed" ? "error" :
+      statusRaw === "error" ? "error" :
+      statusRaw === "processing" ? "processing" : "processing";
     items[idx].status = mappedStatus;
     items[idx].audioUrl = audioNormalized || items[idx].audioUrl;
     items[idx].transcription = transcriptionText;
+    if (errorMessage) {
+      items[idx].errorMessage = errorMessage;
+    }
     await writeTranscriptions(items);
   }
 
-  await appendLog({ time: new Date().toISOString(), level: "info", message: "Webhook de transcrição recebido", meta: { id, status: statusRaw } });
+  await appendLog({ time: new Date().toISOString(), level: errorMessage ? "error" : "info", message: "Webhook de transcrição recebido", meta: { id, status: statusRaw, error: errorMessage } });
 
   return NextResponse.json({ ok: true });
 }

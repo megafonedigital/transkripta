@@ -9,6 +9,7 @@ type Item = {
   sourceUrl: string;
   status: string;
   transcription?: string | null;
+  errorMessage?: string;
   createdAt: string;
 };
 
@@ -62,8 +63,9 @@ export default function HistoricoPage() {
         const matchQ = q
           ? (i.title?.toLowerCase().includes(q.toLowerCase()) ||
              i.sourceUrl?.toLowerCase().includes(q.toLowerCase()) ||
-             i.transcription?.toLowerCase().includes(q.toLowerCase()))
-          : true;
+             i.transcription?.toLowerCase().includes(q.toLowerCase()) ||
+             i.errorMessage?.toLowerCase().includes(q.toLowerCase()))
+           : true;
         const matchStatus = status === "all" ? true : i.status === status;
         const matchOrigin = origin === "all" ? true : i.sourceType === origin;
         return matchQ && matchStatus && matchOrigin;
@@ -82,6 +84,7 @@ export default function HistoricoPage() {
     return "Processando";
   }
 
+  // Dentro do card, mostrar um resumo do erro se existir
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -159,6 +162,11 @@ export default function HistoricoPage() {
                 <p className="text-sm text-gray-400">
                   {it.sourceType} • {new Date(it.createdAt).toLocaleString()}
                 </p>
+                {it.status === 'error' && it.errorMessage && (
+                  <p className="mt-1 text-xs text-red-300 line-clamp-2" title={it.errorMessage}>
+                    {it.errorMessage}
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <span className={`px-3 py-1 rounded text-xs sm:text-sm ${statusStyle(it.status)}`}>

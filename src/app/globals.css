@@ -3,8 +3,8 @@
 :root {
   --background: #0a0a0a;
   --foreground: #e6e6e6;
-+  /* Força controles nativos (select, inputs) a usarem tema escuro no dropdown */
-+  color-scheme: dark;
+  /* Força controles nativos (select, inputs) a usarem tema escuro no dropdown */
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -69,8 +69,14 @@ body {
 
 /* Ajuste de fundo de dropdown (select/options) no modo dark */
 select {
-  background-color: #374151; /* gray-700 */
-  color: #ffffff;
+  /* Usar !important para sobrescrever utilitário bg-transparent aplicado nos selects */
+  background-color: #374151 !important; /* gray-700 */
+  color: #ffffff !important;
+}
+/* Caso o elemento tenha a classe bg-transparent, ainda forçar nosso fundo escuro */
+select.bg-transparent {
+  background-color: #374151 !important;
+  color: #ffffff !important;
 }
 option {
   background-color: #374151; /* gray-700 */
