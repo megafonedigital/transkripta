@@ -210,22 +210,44 @@ export default function HistoricoPage() {
                 <p className="text-sm text-gray-400">
                   {modalItem.sourceType} • {new Date(modalItem.createdAt).toLocaleString()}
                 </p>
+                <div className="mt-2">
+                  <span className={`px-3 py-1 rounded text-xs sm:text-sm ${statusStyle(modalItem.status)}`}>
+                    {statusLabel(modalItem.status)}
+                  </span>
+                </div>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={async () => { if (!modalItem?.transcription) return; await navigator.clipboard.writeText(modalItem.transcription); setCopied(true); setTimeout(() => setCopied(false), 1500); }} className="btn btn-secondary flex items-center gap-2">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="2"/>
-                    <rect x="4" y="4" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="2"/>
-                  </svg>
-                  {copied ? "Copiado!" : "Copiar"}
-                </button>
+                {modalItem.transcription && (
+                  <button onClick={async () => { if (!modalItem?.transcription) return; await navigator.clipboard.writeText(modalItem.transcription); setCopied(true); setTimeout(() => setCopied(false), 1500); }} className="btn btn-secondary flex items-center gap-2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="2"/>
+                      <rect x="4" y="4" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
+                    {copied ? "Copiado!" : "Copiar"}
+                  </button>
+                )}
                 <button onClick={() => setModalItem(null)} className="btn">Fechar</button>
               </div>
             </div>
             <div className="max-h-[60vh] overflow-auto">
-              <pre className="whitespace-pre-wrap text-gray-200 text-sm bg-gray-900/60 p-3 rounded border border-gray-800/60">
-                {modalItem.transcription}
-              </pre>
+              {modalItem.status === 'error' ? (
+                <div className="rounded-lg border border-red-600 bg-red-900/30 text-red-100 p-4">
+                  <div className="flex items-start gap-3">
+                    <svg className="w-5 h-5 flex-shrink-0 text-red-400" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+                      <path d="M12 7v6M12 16h.01" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                    <div>
+                      <p className="font-semibold">Falha na transcrição</p>
+                      <p className="text-sm">{modalItem.errorMessage || "Erro desconhecido."}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <pre className="whitespace-pre-wrap text-gray-200 text-sm bg-gray-900/60 p-3 rounded border border-gray-800/60">
+                  {modalItem.transcription || "Sem transcrição disponível."}
+                </pre>
+              )}
             </div>
           </div>
         </div>
