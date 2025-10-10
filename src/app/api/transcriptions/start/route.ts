@@ -6,6 +6,57 @@ function env(name: string, fallback?: string) {
   return v && v.length > 0 ? v : fallback || "";
 }
 
+// Extrai mensagem de erro amigável do response do n8n, cobrindo formatos comuns (array de validação, {error}, {message})
+function extractInitError(res: Response, data: unknown): { message: string } | null {
+  const isErrorStatus = !res.ok;
+  const asObj = (v: unknown) => (typeof v === "object" && v !== null ? (v as Record<string, unknown>) : undefined);
+
+  const tryFromValidationArray = (root: unknown): string | null => {
+    const arr = Array.isArray(root) ? root : undefined;
+    const first = arr && arr.length > 0 ? (arr[0] as any) : undefined;
+    const body =
+      first?.json?.response?.body ||
+      first?.response?.body ||
+      first?.execution?.data?.resultData?.runData?.["HTTP Request"]?.[0]?.json?.response?.body;
+    if (Array.isArray(body) && body.length > 0) {
+      const b0: any = body[0];
+      const name = b0?.name || "Input validation failed";
+      const details = Array.isArray(b0?.details) ? b0.details : [];
+      const d0 = details.length > 0 ? details[0] : undefined;
+      const pathParts = Array.isArray(d0?.path) ? d0.path : [];
+      const pathStr = pathParts.length ? pathParts.join(".") : "";
+      const msg = d0?.message ? String(d0.message) : "";
+      if (msg) {
+        return `${name}: ${pathStr ? pathStr + ": " : ""}${msg}`;
+      }
+    }
+    const topErr = first?.error || first?.message;
+    return topErr ? String(topErr) : null;
+  };
+
+  if (isErrorStatus) {
+    const obj = asObj(data);
+    if (Array.isArray(data)) {
+      const msg = tryFromValidationArray(data);
+      if (msg) return { message: msg };
+    }
+    if (obj) {
+      const msg = (obj.error as string) || (obj.message as string);
+      if (msg) return { message: msg };
+    }
+    return { message: `Falha ao iniciar transcrição: HTTP ${res.status}` };
+  } else {
+    if (Array.isArray(data)) {
+      const msg = tryFromValidationArray(data);
+      if (msg) return { message: msg };
+    }
+    const obj = asObj(data);
+    const msg = obj ? ((obj.error as string) || (obj.message as string)) : undefined;
+    if (msg) return { message: msg };
+  }
+  return null;
+}
+
 export async function POST(req: Request) {
   const contentType = req.headers.get("content-type") || "";
 
@@ -36,8 +87,30 @@ export async function POST(req: Request) {
       let n8nData: unknown = {};
       try { n8nData = await n8nRes.json(); } catch { n8nData = {}; }
 
+      const initErr = extractInitError(n8nRes, n8nData);
       const n8nObj = typeof n8nData === "object" && n8nData !== null ? (n8nData as Record<string, unknown>) : {};
       const id = (n8nObj.id as string) || (Array.isArray(n8nData) && typeof n8nData[0] === "object" && n8nData[0] !== null ? (n8nData[0] as Record<string, unknown>).id as string : undefined) || crypto.randomUUID();
+
+      if (initErr) {
+        const items = await readTranscriptions();
+        const errorItem: TranscriptionItem = {
+          id,
+          title: title || (incomingFiles[0]?.name ?? "Arquivos"),
+          sourceType: sourceType || "Arquivos",
+          sourceUrl: "",
+          sourceFiles: incomingFiles.map((f) => (typeof (f as { name?: string }).name === "string" ? (f as { name?: string }).name! : "file")),
+          status: "error",
+          errorMessage: initErr.message,
+          createdAt: new Date().toISOString(),
+        };
+        items.unshift(errorItem);
+        await writeTranscriptions(items);
+
+        await appendLog({ time: new Date().toISOString(), level: "error", message: "Falha ao iniciar processamento de arquivos (n8n retornou erro)", meta: { id, sourceType, files: incomingFiles.length, status: n8nRes.status, error: initErr.message } });
+
+        return NextResponse.json({ error: initErr.message, id, n8n: n8nObj }, { status: n8nRes.ok ? 400 : n8nRes.status });
+      }
+
       const status = (n8nObj.status as string) || "processing";
 
       const items = await readTranscriptions();
@@ -81,10 +154,32 @@ export async function POST(req: Request) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url }),
     });
-    const n8nData: unknown = await n8nRes.json();
-    const n8nObj = typeof n8nData === "object" && n8nData !== null ? (n8nData as Record<string, unknown>) : {};
+    let n8nData: unknown = {};
+    try { n8nData = await n8nRes.json(); } catch { n8nData = {}; }
 
+    const initErr = extractInitError(n8nRes, n8nData);
+    const n8nObj = typeof n8nData === "object" && n8nData !== null ? (n8nData as Record<string, unknown>) : {};
     const id = (n8nObj.id as string) || (Array.isArray(n8nData) && typeof n8nData[0] === "object" && n8nData[0] !== null ? (n8nData[0] as Record<string, unknown>).id as string : undefined) || crypto.randomUUID();
+
+    if (initErr) {
+      const items = await readTranscriptions();
+      const errorItem: TranscriptionItem = {
+        id,
+        title: title || url,
+        sourceType: sourceType || "Instagram",
+        sourceUrl: url,
+        status: "error",
+        errorMessage: initErr.message,
+        createdAt: new Date().toISOString(),
+      };
+      items.unshift(errorItem);
+      await writeTranscriptions(items);
+
+      await appendLog({ time: new Date().toISOString(), level: "error", message: "Falha ao iniciar transcrição (n8n retornou erro)", meta: { id, url, sourceType, status: n8nRes.status, error: initErr.message } });
+
+      return NextResponse.json({ error: initErr.message, id, n8n: n8nObj }, { status: n8nRes.ok ? 400 : n8nRes.status });
+    }
+
     const status = (n8nObj.status as string) || "processing";
     const items = await readTranscriptions();
     const newItem: TranscriptionItem = {

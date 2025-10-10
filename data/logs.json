@@ -365,5 +365,24 @@
       "id": "ex6s00mf7srge0css61adgt4gw",
       "status": "succeeded"
     }
+  },
+  {
+    "time": "2025-10-10T18:17:02.909Z",
+    "level": "info",
+    "message": "Transcrição iniciada",
+    "meta": {
+      "id": "0338db98-984d-4c6d-bc4a-f4ed4a32c8c5",
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "sourceType": "YouTube"
+    }
+  },
+  {
+    "time": "2025-10-10T18:17:04.759Z",
+    "level": "info",
+    "message": "Webhook de transcrição recebido",
+    "meta": {
+      "id": "fake-id-do-webhook",
+      "status": "failed"
+    }
   }
 ]
