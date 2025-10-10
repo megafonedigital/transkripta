@@ -50,6 +50,16 @@ export async function POST(req: Request) {
     idx = items.findIndex((i) => i.audioUrl === audioNormalized && i.status === "processing");
   }
 
+  // Fallback heurístico: se audio é googlevideo, priorizar último YouTube em processing
+  if (idx === -1 && typeof audioNormalized === "string" && audioNormalized.includes("googlevideo.com")) {
+    idx = items.findIndex((i) => i.sourceType === "YouTube" && i.status === "processing");
+  }
+
+  // Fallback final: pegar o item mais recente em processing
+  if (idx === -1) {
+    idx = items.findIndex((i) => i.status === "processing");
+  }
+
   if (idx >= 0) {
     // Se veio erro no body, força status como erro
     const mappedStatus: TranscriptionItem["status"] = errorMessage ? "error" : normalizeStatus(statusRaw);
