@@ -79,7 +79,7 @@ export async function POST(req: Request) {
     const n8nRes = await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url, sourceType, title }),
+      body: JSON.stringify({ url }),
     });
     const n8nData: unknown = await n8nRes.json();
     const n8nObj = typeof n8nData === "object" && n8nData !== null ? (n8nData as Record<string, unknown>) : {};
