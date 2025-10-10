@@ -9,39 +9,60 @@ function env(name: string, fallback?: string) {
 // Extrai mensagem de erro amigável do response do n8n, cobrindo formatos comuns (array de validação, {error}, {message})
 function extractInitError(res: Response, data: unknown): { message: string } | null {
   const isErrorStatus = !res.ok;
+
+  // Helper de acesso seguro a propriedades aninhadas, compatível com objetos e arrays
+  const get = (obj: unknown, path: (string | number)[]): unknown => {
+    let cur: unknown = obj;
+    for (const seg of path) {
+      if (cur === null || typeof cur !== "object") return undefined;
+      if (Array.isArray(cur)) {
+        const idx = typeof seg === "number" ? seg : Number.isInteger(Number(seg)) ? Number(seg) : NaN;
+        if (Number.isNaN(idx) || idx < 0 || idx >= cur.length) return undefined;
+        cur = cur[idx];
+      } else {
+        cur = (cur as Record<string, unknown>)[String(seg)];
+      }
+    }
+    return cur;
+  };
+
   const asObj = (v: unknown) => (typeof v === "object" && v !== null ? (v as Record<string, unknown>) : undefined);
 
   const tryFromValidationArray = (root: unknown): string | null => {
     const arr = Array.isArray(root) ? root : undefined;
-    const first = arr && arr.length > 0 ? (arr[0] as any) : undefined;
+    const first = arr && arr.length > 0 ? (arr[0] as unknown) : undefined;
     const body =
-      first?.json?.response?.body ||
-      first?.response?.body ||
-      first?.execution?.data?.resultData?.runData?.["HTTP Request"]?.[0]?.json?.response?.body;
+      get(first, ["json", "response", "body"]) ??
+      get(first, ["response", "body"]) ??
+      get(first, ["execution", "data", "resultData", "runData", "HTTP Request", 0, "json", "response", "body"]);
+
     if (Array.isArray(body) && body.length > 0) {
-      const b0: any = body[0];
-      const name = b0?.name || "Input validation failed";
-      const details = Array.isArray(b0?.details) ? b0.details : [];
+      const b0 = body[0] as unknown;
+      const nameVal = get(b0, ["name"]);
+      const name = typeof nameVal === "string" ? nameVal : "Input validation failed";
+      const detailsVal = get(b0, ["details"]);
+      const details = Array.isArray(detailsVal) ? detailsVal : [];
       const d0 = details.length > 0 ? details[0] : undefined;
-      const pathParts = Array.isArray(d0?.path) ? d0.path : [];
-      const pathStr = pathParts.length ? pathParts.join(".") : "";
-      const msg = d0?.message ? String(d0.message) : "";
+      const pathPartsVal = get(d0, ["path"]);
+      const pathParts = Array.isArray(pathPartsVal) ? pathPartsVal.map(String) : [];
+      const msgVal = get(d0, ["message"]);
+      const msg = typeof msgVal === "string" ? msgVal : "";
       if (msg) {
-        return `${name}: ${pathStr ? pathStr + ": " : ""}${msg}`;
+        return `${name}: ${pathParts.length ? pathParts.join(".") + ": " : ""}${msg}`;
       }
     }
-    const topErr = first?.error || first?.message;
-    return topErr ? String(topErr) : null;
+    const topErrVal = get(first, ["error"]) ?? get(first, ["message"]);
+    return typeof topErrVal === "string" ? topErrVal : null;
   };
 
   if (isErrorStatus) {
-    const obj = asObj(data);
     if (Array.isArray(data)) {
       const msg = tryFromValidationArray(data);
       if (msg) return { message: msg };
     }
+    const obj = asObj(data);
     if (obj) {
-      const msg = (obj.error as string) || (obj.message as string);
+      const msg = typeof obj.error === "string" ? obj.error : (typeof obj.message === "string" ? obj.message : undefined);
       if (msg) return { message: msg };
     }
     return { message: `Falha ao iniciar transcrição: HTTP ${res.status}` };
@@ -51,8 +72,10 @@ function extractInitError(res: Response, data: unknown): { message: string } | n
       if (msg) return { message: msg };
     }
     const obj = asObj(data);
-    const msg = obj ? ((obj.error as string) || (obj.message as string)) : undefined;
-    if (msg) return { message: msg };
+    if (obj) {
+      const msg = typeof obj.error === "string" ? obj.error : (typeof obj.message === "string" ? obj.message : undefined);
+      if (msg) return { message: msg };
+    }
   }
   return null;
 }
