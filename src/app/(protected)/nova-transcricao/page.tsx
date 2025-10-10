@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const networks = ["Instagram", "Facebook", "TikTok", "YouTube", "Arquivos"] as const;
 
@@ -56,6 +57,9 @@ function NetworkIcon({ name }: { name: SourceType }) {
 export default function NovaTranscricaoPage() {
   const [loading, setLoading] = useState(false);
   const [sourceType, setSourceType] = useState<SourceType>("Instagram");
+  const [showModal, setShowModal] = useState(false);
+  const [createdId, setCreatedId] = useState<string | null>(null);
+  const router = useRouter();
 
   async function onSubmitForm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -89,7 +93,9 @@ export default function NovaTranscricaoPage() {
           return;
         }
         const data = await res.json();
-        alert("Processamento de arquivos iniciado. ID: " + (data.id || "N/A"));
+        // alert("Processamento de arquivos iniciado. ID: " + (data.id || "N/A"));
+        setCreatedId(data.id || "N/A");
+        setShowModal(true);
       } catch {
         setLoading(false);
         alert("Erro ao enviar arquivos");
@@ -114,7 +120,9 @@ export default function NovaTranscricaoPage() {
         return;
       }
       const data = await res.json();
-      alert("Transcrição iniciada. ID: " + (data.id || "N/A"));
+      // alert("Transcrição iniciada. ID: " + (data.id || "N/A"));
+      setCreatedId(data.id || "N/A");
+      setShowModal(true);
     } catch {
       setLoading(false);
       alert("Erro ao iniciar transcrição");
@@ -223,6 +231,20 @@ export default function NovaTranscricaoPage() {
           {loading ? "Processando..." : sourceType === "Arquivos" ? "Enviar arquivos" : "Transcrever"}
         </button>
       </form>
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowModal(false)} />
+          <div className="relative z-10 w-full max-w-md rounded-lg bg-gray-800 border border-gray-700 p-6 shadow-lg">
+            <h2 className="text-lg font-semibold">Transcrição iniciada</h2>
+            <p className="text-sm text-gray-300 mt-2">Seu item está sendo processado e em breve aparecerá na guia Histórico.</p>
+            {createdId && <p className="text-xs text-gray-400 mt-1">ID: {createdId}</p>}
+            <div className="mt-4 flex gap-2 justify-end">
+              <button onClick={() => setShowModal(false)} className="btn btn-secondary">Continuar transcrevendo</button>
+              <button onClick={() => router.push('/historico')} className="btn btn-primary">Ir para histórico</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
