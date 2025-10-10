@@ -162,11 +162,7 @@ export default function HistoricoPage() {
                 <p className="text-sm text-gray-400">
                   {it.sourceType} • {new Date(it.createdAt).toLocaleString()}
                 </p>
-                {it.status === 'error' && it.errorMessage && (
-                  <p className="mt-1 text-xs text-red-300 line-clamp-2" title={it.errorMessage}>
-                    {it.errorMessage}
-                  </p>
-                )}
+                {/* Mensagem de erro removida do card; será exibida dentro do modal */}
               </div>
               <div className="flex items-center gap-2">
                 <span className={`px-3 py-1 rounded text-xs sm:text-sm ${statusStyle(it.status)}`}>
