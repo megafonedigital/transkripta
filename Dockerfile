@@ -1,23 +1,23 @@
-# Use imagem leve do Node
-FROM node:20-alpine AS base
+# Use imagem Debian para maior compatibilidade
+FROM node:20-bullseye AS base
 
 WORKDIR /app
 
 # Base de dependências
-FROM node:20-alpine AS deps
+FROM node:20-bullseye AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
 # Fase de build
-FROM node:20-alpine AS builder
+FROM node:20-bullseye AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
 # Fase de execução
-FROM node:20-alpine AS runner
+FROM node:20-bullseye AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
