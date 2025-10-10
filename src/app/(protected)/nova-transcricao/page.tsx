@@ -59,7 +59,13 @@ export default function NovaTranscricaoPage() {
   const [sourceType, setSourceType] = useState<SourceType>("Instagram");
   const [showModal, setShowModal] = useState(false);
   const [createdId, setCreatedId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ type: "error" | "success"; message: string } | null>(null);
   const router = useRouter();
+
+  function showError(message: string) {
+    setToast({ type: "error", message });
+    setTimeout(() => setToast(null), 5000);
+  }
 
   async function onSubmitForm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -89,7 +95,8 @@ export default function NovaTranscricaoPage() {
         });
         setLoading(false);
         if (!res.ok) {
-          alert("Falha ao iniciar processamento de arquivos");
+          // alert("Falha ao iniciar processamento de arquivos");
+          showError("Falha ao iniciar processamento de arquivos");
           return;
         }
         const data = await res.json();
@@ -98,7 +105,8 @@ export default function NovaTranscricaoPage() {
         setShowModal(true);
       } catch {
         setLoading(false);
-        alert("Erro ao enviar arquivos");
+        // alert("Erro ao enviar arquivos");
+        showError("Erro ao enviar arquivos");
       }
       return;
     }
@@ -116,7 +124,8 @@ export default function NovaTranscricaoPage() {
       });
       setLoading(false);
       if (!res.ok) {
-        alert("Falha ao iniciar transcrição");
+        // alert("Falha ao iniciar transcrição");
+        showError("Falha ao iniciar transcrição");
         return;
       }
       const data = await res.json();
@@ -125,7 +134,8 @@ export default function NovaTranscricaoPage() {
       setShowModal(true);
     } catch {
       setLoading(false);
-      alert("Erro ao iniciar transcrição");
+      // alert("Erro ao iniciar transcrição");
+      showError("Erro ao iniciar transcrição");
     }
   }
 
@@ -242,6 +252,18 @@ export default function NovaTranscricaoPage() {
               <button onClick={() => setShowModal(false)} className="btn btn-secondary">Continuar transcrevendo</button>
               <button onClick={() => router.push('/historico')} className="btn btn-primary">Ir para histórico</button>
             </div>
+          </div>
+        </div>
+      )}
+      {toast && (
+        <div className="fixed top-4 right-4 z-[60]">
+          <div className="flex items-start gap-3 rounded-lg border p-4 shadow-lg bg-gray-800 border-red-600 text-red-100" role="alert">
+            <svg className="w-5 h-5 flex-shrink-0 text-red-400" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+              <path d="M12 7v6M12 16h.01" stroke="currentColor" strokeWidth="2" />
+            </svg>
+            <div className="text-sm">{toast.message}</div>
+            <button onClick={() => setToast(null)} className="ml-auto text-xs text-red-300 hover:text-red-200">Fechar</button>
           </div>
         </div>
       )}
