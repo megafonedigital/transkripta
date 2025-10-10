@@ -8,8 +8,19 @@ type DownloadResult = {
   [key: string]: unknown;
 };
 
+type DownloadItem = {
+  status?: string;
+  url?: string;
+  filename?: string;
+  [key: string]: unknown;
+};
+
+function isArrayOfDownloadItems(v: unknown): v is DownloadItem[] {
+  return Array.isArray(v) && v.every((x) => typeof x === "object" && x !== null);
+}
+
 export default function SocialDownloaderPage() {
-  const [result, setResult] = useState<DownloadResult | null>(null);
+  const [result, setResult] = useState<DownloadResult | DownloadItem[] | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -25,13 +36,15 @@ export default function SocialDownloaderPage() {
         body: JSON.stringify({ url }),
       });
       const data: unknown = await res.json();
-      setResult(typeof data === "object" && data !== null ? (data as DownloadResult) : { ok: false, error: "Resposta inválida" });
+      setResult(data as DownloadResult);
     } catch {
       setResult({ ok: false, error: "Falha de comunicação" });
     } finally {
       setLoading(false);
     }
   }
+
+  const items = isArrayOfDownloadItems(result) ? result : [];
 
   return (
     <div className="space-y-6">
@@ -43,6 +56,34 @@ export default function SocialDownloaderPage() {
         </div>
         <button disabled={loading} className="btn btn-primary">{loading ? "Processando..." : "Enviar"}</button>
       </form>
+
+      {items.length > 0 && (
+        <div className="card space-y-3">
+          <h2 className="text-lg font-semibold">Arquivo(s) encontrado(s)</h2>
+          {items.map((it, i) => (
+            <div key={i} className="flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="text-sm text-gray-200 truncate">{it.filename || "arquivo.mp4"}</div>
+                <div className="text-xs text-gray-500">{it.status || "redirect"}</div>
+              </div>
+              {it.url ? (
+                <a
+                  href={String(it.url)}
+                  download={String(it.filename || "download.mp4")}
+                  target="_blank"
+                  rel="noopener"
+                  className="btn btn-secondary"
+                >
+                  Baixar
+                </a>
+              ) : (
+                <span className="text-xs text-gray-500">Sem URL</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       {result && (
         <pre className="card whitespace-pre-wrap text-sm">{JSON.stringify(result, null, 2)}</pre>
       )}
