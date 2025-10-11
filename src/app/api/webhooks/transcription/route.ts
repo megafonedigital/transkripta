@@ -19,7 +19,22 @@ export async function POST(req: Request) {
   const output = obj.output as Record<string, unknown> | undefined;
   const statusRaw = (obj.status as string | undefined) ?? "processing";
   const input = obj.input as Record<string, unknown> | undefined;
-  const errorMessage = typeof obj.error === "string" ? obj.error : undefined;
+  let errorMessage: string | undefined;
+  let hasError = false;
+  if (typeof (obj as any).error === "string") {
+    errorMessage = (obj as any).error as string;
+    hasError = true;
+  } else if ((obj as any).error && typeof (obj as any).error === "object") {
+    const eo = (obj as any).error as Record<string, unknown>;
+    const msg = eo.message;
+    const code = eo.code;
+    const statusCode = eo.status;
+    if (typeof msg === "string") errorMessage = msg;
+    else if (typeof code === "string") errorMessage = code;
+    else if (typeof statusCode === "number") errorMessage = `HTTP ${statusCode}`;
+    else errorMessage = "Erro no provedor";
+    hasError = true;
+  }
 
   // Normaliza possíveis crases/espacos em URLs vindas de integrações
   const audioInput = input?.audio as string | undefined;
@@ -61,12 +76,12 @@ export async function POST(req: Request) {
   }
 
   if (idx >= 0) {
-    // Se veio erro no body, força status como erro
-    const mappedStatus: TranscriptionItem["status"] = errorMessage ? "error" : normalizeStatus(statusRaw);
+    // Se veio erro no body (string ou objeto), força status como erro
+    const mappedStatus: TranscriptionItem["status"] = hasError ? "error" : normalizeStatus(statusRaw);
     items[idx].status = mappedStatus;
     items[idx].audioUrl = audioNormalized || items[idx].audioUrl;
     items[idx].transcription = transcriptionText;
-    if (errorMessage) {
+    if (hasError && errorMessage) {
       items[idx].errorMessage = errorMessage;
     }
     await writeTranscriptions(items);
@@ -80,7 +95,7 @@ export async function POST(req: Request) {
     });
   }
 
-  await appendLog({ time: new Date().toISOString(), level: errorMessage ? "error" : "info", message: "Webhook de transcrição recebido", meta: { id, status: statusRaw, error: errorMessage } });
+  await appendLog({ time: new Date().toISOString(), level: hasError ? "error" : "info", message: "Webhook de transcrição recebido", meta: { id, status: statusRaw, error: errorMessage } });
 
   return NextResponse.json({ ok: true });
 }
